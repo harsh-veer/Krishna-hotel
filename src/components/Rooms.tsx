@@ -4,7 +4,7 @@ export default function Rooms() {
     const rooms = [
         {
             id: 1,
-            name: "Standard AC Room",
+            name: "Super-Deluxe Room",
             price: "₹1,500",
             image: "/images/RUID6be30bebb9614ed3a6ae2bfdf8886bb5.jpg",
             description: "Cozy and budget-friendly room perfect for solo travelers or couples.",
@@ -17,7 +17,7 @@ export default function Rooms() {
         },
         {
             id: 2,
-            name: "Super-Deluxe  Room",
+            name: "Standard Ac Room",
             price: "₹1,200",
             image: "/images/RUID0ab0ad48ea4f4b1db907503b22e4fafd.jpg",
             description: "Spacious enough for the whole family with extra bedding and premium amenities.",
