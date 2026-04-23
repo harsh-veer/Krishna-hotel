@@ -33,7 +33,7 @@ export default function Rooms() {
             id: 3,
             name: "Non-Ac Deluxe",
             price: "₹999",
-            image: "/images/RUID40c03feb9f014035bf1be488172cda98.jpg",
+            image: "/images/WhatsApp Image 2026-04-23 at 23.40.51.jpg",
             description: "Experience luxury with a dedicated seating area and refined decor.",
             features: [
                 { icon: <BedDouble className="h-4 w-4" />, text: "1 Double Bed" },
