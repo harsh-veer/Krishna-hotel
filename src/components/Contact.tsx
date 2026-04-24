@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Mail, Phone, Calendar, Users, Send } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function Contact() {
     const [formData, setFormData] = useState({
@@ -14,7 +15,20 @@ export default function Contact() {
         message: ""
     });
 
-    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        const handleRoomSelected = (e: Event) => {
+            const customEvent = e as CustomEvent;
+            setFormData(prev => ({
+                ...prev,
+                message: `I am interested in booking the ${customEvent.detail}.`
+            }));
+        };
+
+        window.addEventListener('roomSelected', handleRoomSelected);
+        return () => window.removeEventListener('roomSelected', handleRoomSelected);
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         setFormData({
@@ -23,13 +37,38 @@ export default function Contact() {
         });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // In a real app, this would send an API request to a backend
-        console.log("Form Submitted:", formData);
-        setIsSubmitted(true);
-        setTimeout(() => setIsSubmitted(false), 5000);
-        setFormData({ name: "", email: "", phone: "", checkIn: "", checkOut: "", guests: "1", message: "" });
+        setIsLoading(true);
+
+        try {
+            const response = await fetch('/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to submit form');
+            }
+
+            toast.success('Booking Request Sent Successfully!', {
+                duration: 5000,
+                position: 'bottom-center',
+            });
+            
+            setFormData({ name: "", email: "", phone: "", checkIn: "", checkOut: "", guests: "1", message: "" });
+        } catch (err: any) {
+            toast.error(err.message || 'Something went wrong. Please try again.', {
+                duration: 5000,
+                position: 'bottom-center',
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -82,15 +121,6 @@ export default function Contact() {
 
                         <h3 className="text-2xl font-bold text-gray-900 font-heading mb-6">Reservation Request</h3>
 
-                        {isSubmitted ? (
-                            <div className="bg-green-50 border border-green-200 text-green-800 rounded-xl p-6 text-center animate-in fade-in zoom-in duration-300">
-                                <div className="inline-flex rounded-full bg-green-100 p-3 mb-4">
-                                    <Send className="h-6 w-6 text-green-600" />
-                                </div>
-                                <h4 className="text-lg font-bold mb-2">Request Sent Successfully!</h4>
-                                <p className="text-sm">We have received your reservation request and will contact you shortly to confirm your booking.</p>
-                            </div>
-                        ) : (
                             <form onSubmit={handleSubmit} className="space-y-5">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     <div>
@@ -119,6 +149,19 @@ export default function Contact() {
                                             placeholder="+91 8604680149"
                                         />
                                     </div>
+                                </div>
+                                <div>
+                                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue bg-gray-50/50"
+                                        placeholder="john@example.com"
+                                    />
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -188,14 +231,14 @@ export default function Contact() {
 
                                 <button
                                     type="submit"
-                                    className="w-full rounded-lg bg-royal-blue px-4 py-3.5 text-sm font-bold text-white shadow-md hover:bg-royal-blue-light transition-all flex items-center justify-center space-x-2"
+                                    disabled={isLoading}
+                                    className="w-full rounded-lg bg-royal-blue px-4 py-3.5 text-sm font-bold text-white shadow-md hover:bg-royal-blue-light transition-all flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
                                 >
-                                    <span>Send Booking Request</span>
-                                    <Send className="h-4 w-4" />
+                                    <span>{isLoading ? "Sending..." : "Send Booking Request"}</span>
+                                    {!isLoading && <Send className="h-4 w-4" />}
                                 </button>
                                 <p className="text-xs text-center text-gray-500 mt-3">We will call you back to confirm availability and process the booking.</p>
                             </form>
-                        )}
                     </div>
                 </div>
             </div>

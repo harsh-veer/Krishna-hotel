@@ -1,4 +1,7 @@
+"use client";
+
 import { Users, BedDouble, Bath, Tv } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function Rooms() {
     const rooms = [
@@ -47,21 +50,34 @@ export default function Rooms() {
     return (
         <section id="rooms" className="py-20 bg-white">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="text-center max-w-3xl mx-auto mb-16">
+                <motion.div 
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.6 }}
+                    className="text-center max-w-3xl mx-auto mb-16"
+                >
                     <h2 className="text-3xl font-bold font-heading text-gray-900 sm:text-4xl">
                         Comfortable Stays for Every Budget
                     </h2>
                     <p className="mt-4 text-lg text-gray-600">
                         All our rooms are fully air-conditioned, feature daily housekeeping, and include complimentary Wi-Fi to keep you connected.
                     </p>
-                </div>
+                </motion.div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {rooms.map((room) => (
-                        <div key={room.id} className="group flex flex-col rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300">
+                    {rooms.map((room, index) => (
+                        <motion.div 
+                            key={room.id}
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            transition={{ duration: 0.5, delay: index * 0.15 }}
+                            className="group flex flex-col rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300"
+                        >
                             <div className="relative h-64 overflow-hidden">
                                 {room.popular && (
-                                    <div className="absolute top-4 right-4 z-10 bg-gold text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                                    <div className="absolute top-4 right-4 z-10 bg-gold text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-md">
                                         Most Popular
                                     </div>
                                 )}
@@ -93,13 +109,16 @@ export default function Rooms() {
                                 </div>
 
                                 <a
-                                    href="tel:+918604680149"
+                                    href="#contact"
+                                    onClick={() => {
+                                        window.dispatchEvent(new CustomEvent('roomSelected', { detail: room.name }));
+                                    }}
                                     className="block w-full text-center rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-900 hover:bg-royal-blue hover:text-white hover:border-royal-blue transition-colors duration-200"
                                 >
                                     Book This Room
                                 </a>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
             </div>

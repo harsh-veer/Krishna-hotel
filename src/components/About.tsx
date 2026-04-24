@@ -1,4 +1,7 @@
+"use client";
+
 import { CheckCircle2, Star, Coffee, Wifi, Car, Shield } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function About() {
     const highlights = [
@@ -16,7 +19,13 @@ export default function About() {
                 <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 items-center">
 
                     {/* Images Grid */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <motion.div 
+                        initial={{ opacity: 0, x: -40 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true, margin: "-100px" }}
+                        transition={{ duration: 0.6 }}
+                        className="grid grid-cols-2 gap-4"
+                    >
                         <img
                             src="/images/RUID782b578fd9e64411aedb00e919509b29.jpg"
                             alt="Hotel Reception"
@@ -27,9 +36,15 @@ export default function About() {
                             alt="Hotel Room Detail"
                             className="rounded-2xl shadow-lg object-cover h-64 w-full mt-8"
                         />
-                    </div>
+                    </motion.div>
 
-                    <div className="max-w-2xl">
+                    <motion.div 
+                        initial={{ opacity: 0, x: 40 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true, margin: "-100px" }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        className="max-w-2xl"
+                    >
                         <div className="inline-flex items-center space-x-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-sm font-medium text-yellow-800 mb-6">
                             <Star className="h-4 w-4 fill-gold text-gold" />
                             <span>180+ Google Reviews (3.8 Rating)</span>
@@ -61,7 +76,7 @@ export default function About() {
                                 <span className="ml-2 group-hover:translate-x-1 duration-200 transition-transform">→</span>
                             </a>
                         </div>
-                    </div>
+                    </motion.div>
 
                 </div>
             </div>
