@@ -7,6 +7,7 @@ import Location from "@/components/Location";
 import Gallery from "@/components/Gallery";
 import Dining from "@/components/Dining";
 import Contact from "@/components/Contact";
+import FAQ from "@/components/FAQ";
 
 export default function Home() {
   return (
@@ -19,6 +20,7 @@ export default function Home() {
       <Gallery />
       <Reviews />
       <Location />
+      <FAQ />
       <Contact />
     </main>
   );

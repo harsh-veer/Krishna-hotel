@@ -17,7 +17,7 @@ export default function Navbar() {
                     <Link href="#amenities" className="text-gray-700 hover:text-royal-blue-light font-medium transition-colors">Amenities</Link>
                     <Link href="#gallery" className="text-gray-700 hover:text-royal-blue-light font-medium transition-colors">Gallery</Link>
                     <Link href="#location" className="text-gray-700 hover:text-royal-blue-light font-medium transition-colors">Location</Link>
-                    <a href="tel:+918604680149" className="rounded-md bg-gold px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gold-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold transition-colors">
+                    <a href="#contact" className="rounded-md bg-gold px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gold-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold transition-colors">
                         Book Now
                     </a>
                 </div>

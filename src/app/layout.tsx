@@ -3,6 +3,7 @@ import { Inter, Poppins } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingContact from "@/components/FloatingContact";
+import MobileBookingBar from "@/components/MobileBookingBar";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
@@ -65,6 +66,7 @@ export default function RootLayout({
         </main>
         <Footer />
         <FloatingContact />
+        <MobileBookingBar />
         <Toaster position="bottom-right" />
       </body>
     </html>
