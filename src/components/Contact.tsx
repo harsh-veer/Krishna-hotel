@@ -31,9 +31,14 @@ export default function Contact() {
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
+        const { name, value } = e.target;
+        setFormData(prev => {
+            const updated = { ...prev, [name]: value };
+            // If check-in changes and is on/after check-out, clear check-out
+            if (name === 'checkIn' && updated.checkOut && value >= updated.checkOut) {
+                updated.checkOut = '';
+            }
+            return updated;
         });
     };
 
@@ -70,6 +75,12 @@ export default function Contact() {
             setIsLoading(false);
         }
     };
+
+    const today = new Date().toISOString().split('T')[0];
+
+    const minCheckOut = formData.checkIn
+        ? new Date(new Date(formData.checkIn).getTime() + 86400000).toISOString().split('T')[0]
+        : today;
 
     return (
         <section id="contact" className="py-20 relative bg-white">
@@ -175,6 +186,7 @@ export default function Contact() {
                                                 value={formData.checkIn}
                                                 onChange={handleChange}
                                                 required
+                                                min={today}
                                                 className="w-full rounded-lg border border-gray-300 pl-11 pr-4 py-3 text-sm focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue bg-gray-50/50"
                                             />
                                             <Calendar className="absolute left-4 top-3.5 h-4 w-4 text-gray-400" />
@@ -190,6 +202,7 @@ export default function Contact() {
                                                 value={formData.checkOut}
                                                 onChange={handleChange}
                                                 required
+                                                min={minCheckOut}
                                                 className="w-full rounded-lg border border-gray-300 pl-11 pr-4 py-3 text-sm focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue bg-gray-50/50"
                                             />
                                             <Calendar className="absolute left-4 top-3.5 h-4 w-4 text-gray-400" />
