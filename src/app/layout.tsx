@@ -6,6 +6,7 @@ import FloatingContact from "@/components/FloatingContact";
 import MobileBookingBar from "@/components/MobileBookingBar";
 import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const inter = Inter({
@@ -70,6 +71,7 @@ export default function RootLayout({
         <MobileBookingBar />
         <Toaster position="bottom-right" />
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
