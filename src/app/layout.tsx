@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import FloatingContact from "@/components/FloatingContact";
 import MobileBookingBar from "@/components/MobileBookingBar";
 import { Toaster } from "react-hot-toast";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const inter = Inter({
@@ -68,6 +69,7 @@ export default function RootLayout({
         <FloatingContact />
         <MobileBookingBar />
         <Toaster position="bottom-right" />
+        <Analytics />
       </body>
     </html>
   );
