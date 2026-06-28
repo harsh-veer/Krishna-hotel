@@ -7,6 +7,8 @@ export interface IContact extends Document {
   checkIn: string;
   checkOut: string;
   guests: string;
+  roomType: string;
+  status: string;
   message?: string;
   createdAt: Date;
 }
@@ -18,6 +20,13 @@ const ContactSchema: Schema = new Schema({
   checkIn: { type: String, required: true },
   checkOut: { type: String, required: true },
   guests: { type: String, required: true },
+  roomType: { type: String, required: true, default: "Super-Deluxe Room" },
+  status: { 
+    type: String, 
+    required: true, 
+    enum: ["Pending", "Confirmed", "Cancelled", "Checked-in", "Checked-out"], 
+    default: "Pending" 
+  },
   message: { type: String, required: false },
   createdAt: { type: Date, default: Date.now },
 });

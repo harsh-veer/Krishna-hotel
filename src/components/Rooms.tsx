@@ -2,6 +2,10 @@
 
 import { Users, BedDouble, Bath, Tv } from "lucide-react";
 import { motion } from "framer-motion";
+import Link from "next/link";
+
+const toSlug = (name: string) =>
+    name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 
 export default function Rooms() {
     const rooms = [
@@ -42,7 +46,6 @@ export default function Rooms() {
                 { icon: <BedDouble className="h-4 w-4" />, text: "1 Double Bed" },
                 { icon: <Users className="h-4 w-4" />, text: "2 Guests" },
                 { icon: <Bath className="h-4 w-4" />, text: "Bathroom" },
-
             ],
         }
     ];
@@ -108,15 +111,23 @@ export default function Rooms() {
                                     ))}
                                 </div>
 
-                                <a
-                                    href="#contact"
-                                    onClick={() => {
-                                        window.dispatchEvent(new CustomEvent('roomSelected', { detail: room.name }));
-                                    }}
-                                    className="block w-full text-center rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-900 hover:bg-royal-blue hover:text-white hover:border-royal-blue transition-colors duration-200"
-                                >
-                                    Book This Room
-                                </a>
+                                <div className="flex gap-2">
+                                    <Link
+                                        href={`/rooms/${toSlug(room.name)}`}
+                                        className="flex-1 text-center rounded-lg border border-royal-blue px-4 py-3 text-sm font-semibold text-royal-blue hover:bg-royal-blue hover:text-white transition-colors duration-200"
+                                    >
+                                        View Details
+                                    </Link>
+                                    <a
+                                        href="#contact"
+                                        onClick={() => {
+                                            window.dispatchEvent(new CustomEvent('roomSelected', { detail: room.name }));
+                                        }}
+                                        className="flex-1 text-center rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-900 hover:bg-royal-blue hover:text-white hover:border-royal-blue transition-colors duration-200"
+                                    >
+                                        Book Now
+                                    </a>
+                                </div>
                             </div>
                         </motion.div>
                     ))}

@@ -8,6 +8,8 @@ export async function POST(req: Request) {
 
     const adminPassword = process.env.ADMIN_PASSWORD;
 
+    console.log("RECEIVED PASSWORD:", password, "ADMIN PASSWORD:", adminPassword);
+
     if (!adminPassword || password !== adminPassword) {
       return NextResponse.json(
         { error: 'Unauthorized. Invalid password.' },

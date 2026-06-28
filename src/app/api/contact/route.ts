@@ -6,6 +6,7 @@ async function sendTelegramAlert(booking: {
   name: string;
   phone: string;
   email: string;
+  roomType: string;
   checkIn: string;
   checkOut: string;
   guests: string;
@@ -27,6 +28,7 @@ async function sendTelegramAlert(booking: {
     `👤 <b>Name:</b> ${booking.name}\n` +
     `📞 <b>Phone:</b> ${booking.phone}\n` +
     `📧 <b>Email:</b> ${booking.email}\n` +
+    `🏨 <b>Room:</b> ${booking.roomType}\n` +
     `📅 <b>Check-in:</b> ${formatDate(booking.checkIn)}\n` +
     `📅 <b>Check-out:</b> ${formatDate(booking.checkOut)}\n` +
     `👥 <b>Guests:</b> ${booking.guests}\n` +
@@ -60,9 +62,17 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     // Validate request body
-    if (!body.name || !body.email || !body.phone || !body.checkIn || !body.checkOut || !body.guests) {
+    if (!body.name || !body.email || !body.phone || !body.checkIn || !body.checkOut || !body.guests || !body.roomType) {
       return NextResponse.json(
-        { error: 'Name, email, phone, check-in, check-out, and guests are required fields.' },
+        { error: 'Name, email, phone, roomType, check-in, check-out, and guests are required fields.' },
+        { status: 400 }
+      );
+    }
+
+    const validRooms = ["Super-Deluxe Room", "Standard Ac Room", "Non-Ac Deluxe"];
+    if (!validRooms.includes(body.roomType)) {
+      return NextResponse.json(
+        { error: `Invalid roomType: "${body.roomType}".` },
         { status: 400 }
       );
     }
@@ -74,9 +84,11 @@ export async function POST(req: Request) {
       name: body.name,
       email: body.email,
       phone: body.phone,
+      roomType: body.roomType,
       checkIn: body.checkIn,
       checkOut: body.checkOut,
       guests: body.guests,
+      status: 'Pending',
       message: body.message,
     });
 
