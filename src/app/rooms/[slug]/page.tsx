@@ -183,6 +183,13 @@ export default function RoomDetailPage({ params }: { params: Promise<{ slug: str
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+    if (!emailRegex.test(formData.email.trim())) {
+      toast.error("Please enter a valid Gmail address (must include @gmail.com)");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -342,7 +349,7 @@ export default function RoomDetailPage({ params }: { params: Promise<{ slug: str
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="e.g. John Doe"
+                  placeholder="Krishna Hotel"
                   className="w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-xs focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue bg-gray-50/50"
                 />
               </div>
@@ -366,9 +373,11 @@ export default function RoomDetailPage({ params }: { params: Promise<{ slug: str
                     type="email"
                     name="email"
                     required
+                    pattern="[a-zA-Z0-9._%+-]+@gmail\.com"
+                    title="Please enter a valid email address ending with @gmail.com"
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="john@example.com"
+                    placeholder="krishnahotel10851@gmail.com"
                     className="w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-xs focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue bg-gray-50/50"
                   />
                 </div>

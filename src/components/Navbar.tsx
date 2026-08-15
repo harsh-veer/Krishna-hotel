@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { Menu, X, MessageSquare } from "lucide-react";
 import { useState } from "react";
@@ -9,10 +10,20 @@ export default function Navbar() {
 
     return (
         <nav className="sticky top-0 z-50 w-full bg-white shadow-md">
-            <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+            <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
                 <div className="flex items-center">
-                    <Link href="/" className="text-2xl font-bold text-royal-blue">
-                        Krishna Hotel
+                    <Link href="/" className="flex items-center gap-3 group">
+                        <Image
+                            src="/logo-transparent.png"
+                            alt="Krishna Hotel Logo"
+                            width={44}
+                            height={44}
+                            className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
+                            priority
+                        />
+                        <span className="text-2xl font-bold text-royal-blue tracking-tight">
+                            Krishna Hotel
+                        </span>
                     </Link>
                 </div>
 
@@ -29,6 +40,8 @@ export default function Navbar() {
                         <MessageSquare className="h-4 w-4" />
                         <span>Reviews</span>
                     </Link>
+
+                    {/* Book Now Button */}
                     <Link href="/#contact" className="rounded-md bg-gold px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gold-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold transition-colors">
                         Book Now
                     </Link>
@@ -62,6 +75,7 @@ export default function Navbar() {
                         <MessageSquare className="h-4 w-4" />
                         <span>Leave a Review</span>
                     </Link>
+
                     <Link href="/#contact" onClick={() => setMobileOpen(false)} className="block w-full text-center rounded-md bg-gold px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gold-light transition-colors">
                         Book Now
                     </Link>

@@ -20,8 +20,13 @@ async function sendTelegramAlert(booking: {
     return;
   }
 
-  const formatDate = (d: string) =>
-    new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  const formatDate = (d: string) => {
+    try {
+      return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    } catch {
+      return d;
+    }
+  };
 
   const text =
     `🔔 <b>New Booking at Krishna Hotel!</b>\n\n` +
@@ -56,44 +61,75 @@ async function sendTelegramAlert(booking: {
   }
 }
 
-
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    // Validate request body
-    if (!body.name || !body.email || !body.phone || !body.checkIn || !body.checkOut || !body.guests || !body.roomType) {
+    const name = body.name?.trim();
+    const phone = body.phone?.trim();
+    const email = body.email?.trim() || 'guest@krishnaahotel.in';
+    const roomType = body.roomType?.trim() || 'Standard Ac Room';
+    const guests = body.guests?.trim() || '2';
+    let checkIn = body.checkIn?.trim();
+    let checkOut = body.checkOut?.trim();
+
+    // Default checkIn to today if missing
+    if (!checkIn) {
+      checkIn = new Date().toISOString().split('T')[0];
+    }
+
+    // Default checkOut to 1 day after checkIn if missing
+    if (!checkOut) {
+      const inDate = new Date(checkIn);
+      const nextDay = new Date(inDate.getTime() + 86400000);
+      checkOut = nextDay.toISOString().split('T')[0];
+    }
+
+    // Validate essential fields
+    if (!name || !phone) {
       return NextResponse.json(
-        { error: 'Name, email, phone, roomType, check-in, check-out, and guests are required fields.' },
+        { error: 'Name and phone number are required.' },
+        { status: 400 }
+      );
+    }
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+    if (email && email !== 'guest@krishnaahotel.in' && !emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: 'Email must be in a valid format including @gmail.com' },
         { status: 400 }
       );
     }
 
     const validRooms = ["Super-Deluxe Room", "Standard Ac Room", "Non-Ac Deluxe"];
-    if (!validRooms.includes(body.roomType)) {
-      return NextResponse.json(
-        { error: `Invalid roomType: "${body.roomType}".` },
-        { status: 400 }
-      );
-    }
+    const finalRoomType = validRooms.includes(roomType) ? roomType : "Standard Ac Room";
 
     await dbConnect();
 
     // Create the contact message
     const newContact = await Contact.create({
-      name: body.name,
-      email: body.email,
-      phone: body.phone,
-      roomType: body.roomType,
-      checkIn: body.checkIn,
-      checkOut: body.checkOut,
-      guests: body.guests,
+      name,
+      email,
+      phone,
+      roomType: finalRoomType,
+      checkIn,
+      checkOut,
+      guests,
       status: 'Pending',
-      message: body.message,
+      message: body.message || 'Instant AI Booking Request',
     });
 
-    // Fire Telegram alert (non-blocking — won't break booking on failure)
-    sendTelegramAlert(body);
+    // Fire Telegram alert (non-blocking)
+    sendTelegramAlert({
+      name,
+      email,
+      phone,
+      roomType: finalRoomType,
+      checkIn,
+      checkOut,
+      guests,
+      message: body.message,
+    });
 
     return NextResponse.json(
       { message: 'Your booking request has been sent successfully!', data: newContact },
@@ -107,4 +143,3 @@ export async function POST(req: Request) {
     );
   }
 }
-

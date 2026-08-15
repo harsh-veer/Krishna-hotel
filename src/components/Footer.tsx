@@ -1,10 +1,21 @@
+import Image from "next/image";
+
 export default function Footer() {
     return (
         <footer className="bg-gray-900 text-white">
             <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>
-                        <h3 className="text-xl font-bold font-heading text-gold mb-4">Krishna Hotel</h3>
+                        <div className="flex items-center gap-3 mb-4">
+                            <Image
+                                src="/logo-transparent.png"
+                                alt="Krishna Hotel Logo"
+                                width={44}
+                                height={44}
+                                className="h-10 w-auto object-contain bg-white/10 p-1 rounded-lg"
+                            />
+                            <h3 className="text-xl font-bold font-heading text-gold">Krishna Hotel</h3>
+                        </div>
                         <p className="text-gray-300 mb-4">
                             Affordable luxury stay on the Ayodhya Highway. Comfort, cleanliness, and budget-friendly pricing for families and travelers.
                         </p>

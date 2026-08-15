@@ -84,10 +84,21 @@ export default function Contact() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
+        let sanitizedValue = value;
+
+        if (name === "name") {
+            sanitizedValue = value.replace(/[^a-zA-Z\s]/g, "");
+        } else if (name === "phone") {
+            sanitizedValue = value.startsWith("+")
+                ? "+" + value.slice(1).replace(/\D/g, "")
+                : value.replace(/\D/g, "");
+            if (sanitizedValue.length > 14) return;
+        }
+
         setFormData(prev => {
-            const updated = { ...prev, [name]: value };
+            const updated = { ...prev, [name]: sanitizedValue };
             // If check-in changes and is on/after check-out, clear check-out
-            if (name === 'checkIn' && updated.checkOut && value >= updated.checkOut) {
+            if (name === 'checkIn' && updated.checkOut && sanitizedValue >= updated.checkOut) {
                 updated.checkOut = '';
             }
             return updated;
@@ -96,6 +107,16 @@ export default function Contact() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+        if (!emailRegex.test(formData.email.trim())) {
+            toast.error('Please enter a valid Gmail address (must include @gmail.com)', {
+                duration: 5000,
+                position: 'bottom-center',
+            });
+            return;
+        }
+
         setIsLoading(true);
 
         try {
@@ -197,7 +218,7 @@ export default function Contact() {
                                             onChange={handleChange}
                                             required
                                             className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue bg-gray-50/50"
-                                            placeholder="John Doe"
+                                            placeholder="Krishna Hotel"
                                         />
                                     </div>
                                     <div>
@@ -223,8 +244,10 @@ export default function Contact() {
                                         value={formData.email}
                                         onChange={handleChange}
                                         required
+                                        pattern="[a-zA-Z0-9._%+-]+@gmail\.com"
+                                        title="Please enter a valid email address ending with @gmail.com"
                                         className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue bg-gray-50/50"
-                                        placeholder="john@example.com"
+                                        placeholder="krishnahotel10851@gmail.com"
                                     />
                                 </div>
 

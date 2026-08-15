@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingContact from "@/components/FloatingContact";
 import MobileBookingBar from "@/components/MobileBookingBar";
+import AIChatbot from "@/components/AIChatbot";
 import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
@@ -35,6 +36,15 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+
+  icons: {
+    icon: [
+      { url: "/logo-icon.png", type: "image/png" },
+      { url: "/favicon.ico" }
+    ],
+    shortcut: "/logo-icon.png",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -60,12 +70,15 @@ export default function RootLayout({
     },
     telephone: "+918604680149",
     image: "https://krishnahotel.com/images/pexels-jplenio-1435075.jpg",
-    priceRange: "₹1200 - ₹2500"
+    priceRange: "₹999 - ₹1500"
   };
 
   return (
     <html lang="en" className="scroll-smooth">
       <head>
+        <link rel="icon" href="/logo-icon.png" type="image/png" sizes="any" />
+        <link rel="shortcut icon" href="/logo-icon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -81,6 +94,7 @@ export default function RootLayout({
         <Footer />
         <FloatingContact />
         <MobileBookingBar />
+        <AIChatbot />
         <Toaster position="bottom-right" />
         <Analytics />
       </body>

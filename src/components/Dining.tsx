@@ -72,8 +72,8 @@ export default function Dining() {
                         {/* We use a placeholder image URL for the food/dining or reuse a nice room interior if food is unavailable. For now, we will use a high quality unsplash food image. */}
                         <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3]">
                             <img
-                                src="/images/hotel-breakfast.jpg"
-                                alt="Delicious Indian Food"
+                                src="/images/indian-food-dining.jpg"
+                                alt="Fresh North Indian Thali & Breakfast Spread"
                                 className="w-full h-full object-cover"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
