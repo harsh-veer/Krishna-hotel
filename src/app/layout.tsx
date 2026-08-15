@@ -20,8 +20,21 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Krishna Hotel | Affordable Luxury Stay on Ayodhya Highway",
-  description: "Comfortable & Affordable Stay in Ambedkar Nagar. AC Rooms, Free Breakfast, Family Friendly.",
+  metadataBase: new URL("https://krishnaahotel.in"),
+
+  title: "Krishna Hotel | Comfortable & Affordable Stay in Ambedkar Nagar",
+
+  description:
+    "Krishna Hotel offers comfortable and affordable AC rooms, free breakfast and family-friendly accommodation on the Ayodhya-Akbarpur Road in Ambedkar Nagar.",
+
+  alternates: {
+    canonical: "https://krishnaahotel.in/",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
