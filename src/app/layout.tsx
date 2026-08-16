@@ -39,11 +39,14 @@ export const metadata: Metadata = {
 
   icons: {
     icon: [
-      { url: "/logo-icon.png", type: "image/png" },
-      { url: "/favicon.ico" }
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/logo-icon.png", type: "image/png", sizes: "602x602" },
     ],
-    shortcut: "/logo-icon.png",
-    apple: "/apple-touch-icon.png",
+    shortcut: "/favicon.ico",
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
 };
 
@@ -76,9 +79,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
-        <link rel="icon" href="/logo-icon.png" type="image/png" sizes="any" />
-        <link rel="shortcut icon" href="/logo-icon.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
