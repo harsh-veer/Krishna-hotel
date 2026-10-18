@@ -5,6 +5,7 @@ import { Sparkles, Send, X, Bot, Phone, ChevronDown, MapPin, Calendar, BedDouble
 import Image from "next/image";
 import toast from "react-hot-toast";
 import EmailOtpField from "@/components/EmailOtpField";
+import { bookingWhatsAppLink } from "@/lib/hotel";
 
 interface Message {
   id: string;
@@ -222,7 +223,7 @@ export default function AIChatbot() {
       const confirmMsg: Message = {
         id: (Date.now() + 2).toString(),
         sender: "bot",
-        text: `🎉 **Booking Request Received!**\n\n• **Guest**: ${nameTrimmed}\n• **Phone**: ${phoneTrimmed}\n• **Room**: ${bookingForm.roomType}\n• **Check-in**: ${checkInDate}\n• **Check-out**: ${checkOutDate}\n\nOur front desk will call you at **${phoneTrimmed}** shortly to confirm your room.\n\n📲 [Confirm Instantly via WhatsApp](https://wa.me/918604680149?text=Hi%20Krishna%20Hotel,%20I%20requested%20a%20booking%20for%20${encodeURIComponent(bookingForm.roomType)})`,
+        text: `🎉 **Booking Request Received!**\n\n• **Guest**: ${nameTrimmed}\n• **Phone**: ${phoneTrimmed}\n• **Room**: ${bookingForm.roomType}\n• **Check-in**: ${checkInDate}\n• **Check-out**: ${checkOutDate}\n\nOur front desk will call you at **${phoneTrimmed}** shortly to confirm your room.\n\n📲 [Confirm Instantly via WhatsApp](${bookingWhatsAppLink({ name: nameTrimmed, roomType: bookingForm.roomType, checkIn: checkInDate, checkOut: checkOutDate, guests: bookingForm.guests })})`,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
 

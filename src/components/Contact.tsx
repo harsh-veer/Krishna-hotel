@@ -4,6 +4,14 @@ import { useState, useEffect } from "react";
 import { Mail, Phone, Calendar, Users, Send, BedDouble } from "lucide-react";
 import toast from "react-hot-toast";
 import EmailOtpField from "@/components/EmailOtpField";
+import HouseRules from "@/components/HouseRules";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
+import { GUEST_LIMIT_BY_ROOM } from "@/lib/rooms";
+import { bookingWhatsAppLink } from "@/lib/hotel";
+
+// Keeps the guest count within what the chosen room allows.
+const clampGuests = (roomType: string, guests: string) =>
+    String(Math.min(Number(guests) || 1, GUEST_LIMIT_BY_ROOM[roomType] ?? 2));
 
 export default function Contact() {
     const [formData, setFormData] = useState({
@@ -39,6 +47,7 @@ export default function Contact() {
             setFormData(prev => ({
                 ...prev,
                 roomType: customEvent.detail,
+                guests: clampGuests(customEvent.detail, prev.guests),
                 message: prev.message || `I am interested in booking the ${customEvent.detail}.`
             }));
         };
@@ -102,6 +111,9 @@ export default function Contact() {
             // If check-in changes and is on/after check-out, clear check-out
             if (name === 'checkIn' && updated.checkOut && sanitizedValue >= updated.checkOut) {
                 updated.checkOut = '';
+            }
+            if (name === 'roomType') {
+                updated.guests = clampGuests(sanitizedValue, prev.guests);
             }
             return updated;
         });
@@ -308,13 +320,13 @@ export default function Contact() {
                                                 onChange={handleChange}
                                                 className="w-full rounded-lg border border-gray-300 pl-11 pr-4 py-3 text-sm focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue bg-gray-50/50 appearance-none"
                                             >
-                                                <option value="1">1 Person</option>
-                                                <option value="2">2 People</option>
-                                                <option value="3">3 People</option>
-                                                <option value="4+">4+ People</option>
+                                                {Array.from({ length: GUEST_LIMIT_BY_ROOM[formData.roomType] ?? 2 }, (_, i) => i + 1).map((n) => (
+                                                    <option key={n} value={String(n)}>{n === 1 ? "1 Person" : `${n} People`}</option>
+                                                ))}
                                             </select>
                                             <Users className="absolute left-4 top-3.5 h-4 w-4 text-gray-400" />
                                         </div>
+                                        <p className="mt-1 text-xs text-gray-500">More guests? Book 2 rooms and mention it in special requests.</p>
                                     </div>
                                 </div>
 
@@ -368,6 +380,18 @@ export default function Contact() {
                                     {!isLoading && <Send className="h-4 w-4" />}
                                 </button>
                                 <p className="text-xs text-center text-gray-500 mt-3">We will call you back to confirm availability and process the booking.</p>
+                                <a
+                                    href={bookingWhatsAppLink(formData)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="mt-3 w-full rounded-lg border border-[#25D366] px-4 py-3 text-sm font-semibold text-[#128C4A] hover:bg-[#25D366]/10 transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <WhatsAppIcon />
+                                    <span>Or book on WhatsApp</span>
+                                </a>
+                                <div className="mt-5">
+                                    <HouseRules />
+                                </div>
                             </form>
                     </div>
                 </div>

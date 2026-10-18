@@ -18,6 +18,9 @@ import {
 import toast from "react-hot-toast";
 import { ROOMS_DATA } from "@/lib/rooms";
 import EmailOtpField from "@/components/EmailOtpField";
+import HouseRules from "@/components/HouseRules";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
+import { bookingWhatsAppLink } from "@/lib/hotel";
 
 export default function RoomDetail({ slug }: { slug: string }) {
   const room = ROOMS_DATA[slug];
@@ -345,11 +348,11 @@ export default function RoomDetail({ slug }: { slug: string }) {
                   onChange={handleChange}
                   className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-xs focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue bg-gray-50/50 appearance-none"
                 >
-                  <option value="1">1 Guest</option>
-                  <option value="2">2 Guests</option>
-                  <option value="3">3 Guests</option>
-                  <option value="4+">4+ Guests</option>
+                  {Array.from({ length: room.guestLimit }, (_, i) => i + 1).map((n) => (
+                    <option key={n} value={String(n)}>{n === 1 ? "1 Guest" : `${n} Guests`}</option>
+                  ))}
                 </select>
+                <p className="mt-1 text-[10px] text-gray-400">Up to {room.guestLimit} guests. More people? Book 2 rooms.</p>
               </div>
 
               {/* Availability checks */}
@@ -390,6 +393,18 @@ export default function RoomDetail({ slug }: { slug: string }) {
               <ShieldCheck className="h-3.5 w-3.5 text-royal-blue" />
               <span>Safe & Secure Booking Confirmation</span>
             </div>
+
+            <a
+              href={bookingWhatsAppLink({ ...formData, roomType: room.name })}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full rounded-lg border border-[#25D366] px-4 py-2.5 text-xs font-semibold text-[#128C4A] hover:bg-[#25D366]/10 transition-colors flex items-center justify-center gap-2"
+            >
+              <WhatsAppIcon />
+              <span>Or book on WhatsApp</span>
+            </a>
+
+            <HouseRules compact />
           </div>
 
         </div>

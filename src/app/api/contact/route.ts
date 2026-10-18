@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import { Contact } from '@/models/Contact';
 import { consumeVerifiedEmail, EMAIL_REGEX, normalizeEmail } from '@/lib/otp';
+import { sendBookingRequestEmail } from '@/lib/mailer';
+import { GUEST_LIMIT_BY_ROOM } from '@/lib/rooms';
 
 async function sendTelegramAlert(booking: {
   name: string;
@@ -104,6 +106,15 @@ export async function POST(req: Request) {
     const validRooms = ["Super-Deluxe Room", "Standard Ac Room", "Non-Ac Deluxe"];
     const finalRoomType = validRooms.includes(roomType) ? roomType : "Standard Ac Room";
 
+    const guestLimit = GUEST_LIMIT_BY_ROOM[finalRoomType] ?? 2;
+    const guestCount = parseInt(guests, 10);
+    if (!Number.isFinite(guestCount) || guestCount < 1 || guestCount > guestLimit) {
+      return NextResponse.json(
+        { error: `The ${finalRoomType} fits up to ${guestLimit} guests. For more people, please book 2 rooms.` },
+        { status: 400 }
+      );
+    }
+
     await dbConnect();
 
     // Every booking needs an email address that passed OTP verification.
@@ -126,6 +137,22 @@ export async function POST(req: Request) {
       status: 'Pending',
       message: body.message || 'Instant AI Booking Request',
     });
+
+    // Email the guest a receipt. A failure here must not fail the booking itself.
+    try {
+      await sendBookingRequestEmail({
+        reference: String(newContact._id).slice(-6).toUpperCase(),
+        name,
+        email,
+        phone,
+        roomType: finalRoomType,
+        checkIn,
+        checkOut,
+        guests,
+      });
+    } catch (err) {
+      console.error('Booking email failed:', err);
+    }
 
     // Fire Telegram alert (non-blocking)
     sendTelegramAlert({

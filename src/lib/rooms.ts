@@ -15,6 +15,7 @@ export interface RoomData {
   description: string;
   longDescription: string;
   maxGuests: string;
+  guestLimit: number;
   bedType: string;
   bathType: string;
   amenities: { icon: LucideIcon; name: string }[];
@@ -29,6 +30,7 @@ export const ROOMS_DATA: Record<string, RoomData> = {
     description: "Cozy and budget-friendly room perfect for solo travelers or couples.",
     longDescription: "Experience a superior standard of comfort in our Super-Deluxe Room. This room is thoughtfully designed to blend modern luxury with budget-friendly pricing. Featuring premium furniture, a plush queen-sized bed, high-power split air-conditioning, and a flat-screen smart TV for entertainment. Perfect for couples, business executives, or family members traveling to Ayodhya. Enjoy complimentary high-speed Wi-Fi, daily housekeeping, and premium bathroom amenities.",
     maxGuests: "2-3 Guests",
+    guestLimit: 3,
     bedType: "1 Queen Bed",
     bathType: "Premium Bath",
     amenities: [
@@ -50,6 +52,7 @@ export const ROOMS_DATA: Record<string, RoomData> = {
     description: "Spacious enough for the whole family with extra bedding and premium amenities.",
     longDescription: "The Standard AC Room is our most popular option for highway travelers and families seeking value without compromising on comfort. Spaciously laid out with a large double bed, excellent split air conditioning, and a flat-screen TV. Safe and secure parking, immediate hot water supply, and clean, attached western toilets make this room a comfortable retreat after a long day of travel on the Ayodhya highway.",
     maxGuests: "2 Guests",
+    guestLimit: 2,
     bedType: "1 Double Bed",
     bathType: "Attached Bath",
     amenities: [
@@ -71,6 +74,7 @@ export const ROOMS_DATA: Record<string, RoomData> = {
     description: "Experience luxury with a dedicated seating area and refined decor.",
     longDescription: "Designed for budget-conscious travelers, our Non-Ac Deluxe Room offers comfortable lodging at an unbeatable price point. It features a spacious layout with a double bed, clean sheets, and a clean attached bathroom. A ceiling fan provides cooling, and the room includes a desk and seating area. Guests enjoy all general hotel benefits including safe parking and free high-speed Wi-Fi.",
     maxGuests: "2 Guests",
+    guestLimit: 2,
     bedType: "1 Double Bed",
     bathType: "Clean Bathroom",
     amenities: [
@@ -85,3 +89,8 @@ export const ROOMS_DATA: Record<string, RoomData> = {
     ]
   }
 };
+
+// Guest limit by room name, as the booking forms and API refer to rooms by name.
+export const GUEST_LIMIT_BY_ROOM: Record<string, number> = Object.fromEntries(
+  Object.values(ROOMS_DATA).map((room) => [room.name, room.guestLimit])
+);
