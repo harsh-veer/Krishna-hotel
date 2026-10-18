@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import { Contact } from '@/models/Contact';
+import { sendBookingStatusEmail } from '@/lib/mailer';
 
 export async function DELETE(
   req: Request,
@@ -74,20 +75,36 @@ export async function PATCH(
 
     await dbConnect();
 
-    const updated = await Contact.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
-    );
+    const previous = await Contact.findByIdAndUpdate(id, { status });
 
-    if (!updated) {
+    if (!previous) {
       return NextResponse.json(
         { error: 'Booking not found.' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ success: true, booking: updated }, { status: 200 });
+    // Tell the guest when the booking is confirmed or cancelled (only when the status actually changes).
+    let emailSent = false;
+    if ((status === 'Confirmed' || status === 'Cancelled') && previous.status !== status && previous.email) {
+      try {
+        emailSent = await sendBookingStatusEmail({
+          reference: String(previous._id).slice(-6).toUpperCase(),
+          name: previous.name,
+          email: previous.email,
+          roomType: previous.roomType,
+          checkIn: previous.checkIn,
+          checkOut: previous.checkOut,
+          guests: previous.guests,
+          status,
+        });
+      } catch (mailError) {
+        console.error('Status email failed:', mailError);
+      }
+    }
+
+    const booking = { ...previous.toObject(), status };
+    return NextResponse.json({ success: true, booking, emailSent }, { status: 200 });
   } catch (error) {
     console.error('Update Booking Error:', error);
     return NextResponse.json(

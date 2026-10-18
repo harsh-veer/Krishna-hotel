@@ -140,3 +140,90 @@ export async function sendBookingRequestEmail(booking: {
     html,
   });
 }
+
+// Sent when the front desk marks a booking Confirmed or Cancelled in /admin.
+export async function sendBookingStatusEmail(booking: {
+  reference: string;
+  name: string;
+  email: string;
+  roomType: string;
+  checkIn: string;
+  checkOut: string;
+  guests: string;
+  status: "Confirmed" | "Cancelled";
+}): Promise<boolean> {
+  const t = getTransporter();
+  if (!t) {
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`[Status email] would send ${booking.status} for ${booking.reference} to ${booking.email}`);
+    }
+    return false;
+  }
+
+  const confirmed = booking.status === "Confirmed";
+  const whatsapp = bookingWhatsAppLink(booking);
+  const rows: [string, string][] = [
+    ["Reference", booking.reference],
+    ["Room", booking.roomType],
+    ["Check-in", `${formatDate(booking.checkIn)}, from ${CHECK_IN_TIME}`],
+    ["Check-out", `${formatDate(booking.checkOut)}, by ${CHECK_OUT_TIME}`],
+    ["Guests", booking.guests],
+  ];
+  const intro = confirmed
+    ? "Good news! Your booking at Krishna Hotel is confirmed:"
+    : "Your booking request at Krishna Hotel has been cancelled:";
+  const notes = confirmed
+    ? [
+        `Pay at the hotel (${PAYMENT_METHODS.join(", ")}). No advance payment is needed.`,
+        `Please bring a valid photo ID for every adult (${ID_PROOFS}).`,
+        "To change or cancel, call or WhatsApp +91 86046 80149.",
+      ]
+    : [
+        "If you did not ask for this or would like to book other dates, call or WhatsApp +91 86046 80149.",
+      ];
+
+  const text = [
+    `Namaste ${booking.name},`,
+    "",
+    intro,
+    "",
+    ...rows.map(([k, v]) => `${k}: ${v}`),
+    "",
+    ...notes,
+    "",
+    `WhatsApp: ${whatsapp}`,
+    "",
+    "Krishna Hotel, Ayodhya-Akbarpur Road, Near Fire Station, Ambedkar Nagar 224122",
+  ].join("\n");
+
+  const accent = confirmed ? "#15803d" : "#b91c1c";
+  const html = `<div style="font-family:Arial,sans-serif;max-width:520px;margin:auto;padding:24px;border:1px solid #e5e7eb;border-radius:12px;color:#374151">
+  <h2 style="color:#1e3a8a;margin:0 0 4px">Krishna Hotel</h2>
+  <p style="margin:0 0 20px;color:#6b7280;font-size:13px">Ayodhya-Akbarpur Road, Ambedkar Nagar</p>
+  <p style="margin:0 0 12px">Namaste ${escapeHtml(booking.name)},</p>
+  <p style="margin:0 0 16px;font-weight:bold;color:${accent}">${intro}</p>
+  <table style="width:100%;border-collapse:collapse;font-size:14px;margin:0 0 16px">
+    ${rows
+      .map(
+        ([k, v]) =>
+          `<tr><td style="padding:6px 0;color:#6b7280;width:110px">${k}</td><td style="padding:6px 0;font-weight:bold;color:#111827">${escapeHtml(v)}</td></tr>`
+      )
+      .join("")}
+  </table>
+  <ul style="margin:0 0 20px;padding-left:18px;font-size:13px;color:#4b5563;line-height:1.6">
+    ${notes.map((n) => `<li>${n}</li>`).join("")}
+  </ul>
+  <a href="${whatsapp}" style="display:inline-block;background:#25D366;color:#fff;text-decoration:none;font-weight:bold;padding:10px 18px;border-radius:8px">Message us on WhatsApp</a>
+</div>`;
+
+  await t.sendMail({
+    from: `"Krishna Hotel" <${process.env.GMAIL_USER}>`,
+    to: booking.email,
+    subject: confirmed
+      ? `Booking confirmed: ${booking.roomType}, ${formatDate(booking.checkIn)} (Ref ${booking.reference})`
+      : `Booking cancelled: ${booking.roomType}, ${formatDate(booking.checkIn)} (Ref ${booking.reference})`,
+    text,
+    html,
+  });
+  return true;
+}

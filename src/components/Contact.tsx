@@ -8,6 +8,7 @@ import HouseRules from "@/components/HouseRules";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { GUEST_LIMIT_BY_ROOM } from "@/lib/rooms";
 import { bookingWhatsAppLink } from "@/lib/hotel";
+import { isValidIndianMobile, PHONE_ERROR, sanitizePhoneInput } from "@/lib/validation";
 
 // Keeps the guest count within what the chosen room allows.
 const clampGuests = (roomType: string, guests: string) =>
@@ -100,10 +101,7 @@ export default function Contact() {
         if (name === "name") {
             sanitizedValue = value.replace(/[^a-zA-Z\s]/g, "");
         } else if (name === "phone") {
-            sanitizedValue = value.startsWith("+")
-                ? "+" + value.slice(1).replace(/\D/g, "")
-                : value.replace(/\D/g, "");
-            if (sanitizedValue.length > 14) return;
+            sanitizedValue = sanitizePhoneInput(value);
         }
 
         setFormData(prev => {
@@ -121,6 +119,11 @@ export default function Contact() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!isValidIndianMobile(formData.phone)) {
+            toast.error(PHONE_ERROR, { duration: 5000, position: 'bottom-center' });
+            return;
+        }
 
         if (!emailVerified) {
             toast.error('Please verify your email with the 6-digit code first.', {
@@ -232,6 +235,8 @@ export default function Contact() {
                                             value={formData.name}
                                             onChange={handleChange}
                                             required
+                                            inputMode="tel"
+                                            maxLength={13}
                                             className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue bg-gray-50/50"
                                             placeholder="Krishna Hotel"
                                         />
@@ -246,7 +251,7 @@ export default function Contact() {
                                             onChange={handleChange}
                                             required
                                             className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue bg-gray-50/50"
-                                            placeholder="+91 8604680149"
+                                            placeholder="10-digit mobile, e.g. 9876543210"
                                         />
                                     </div>
                                 </div>

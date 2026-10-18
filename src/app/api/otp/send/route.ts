@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { EMAIL_REGEX, issueOtp, normalizeEmail } from "@/lib/otp";
+import { EMAIL_ERROR } from "@/lib/validation";
 import { sendOtpEmail } from "@/lib/mailer";
 
 export async function POST(req: Request) {
   try {
     const { email } = await req.json();
     if (typeof email !== "string" || !EMAIL_REGEX.test(email.trim())) {
-      return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
+      return NextResponse.json({ error: EMAIL_ERROR }, { status: 400 });
     }
 
     const result = await issueOtp(email);

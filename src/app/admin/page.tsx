@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { 
   Lock, 
   Unlock, 
@@ -218,6 +219,11 @@ export default function AdminDashboard() {
 
       const data = await response.json();
       setBookings((prev) => prev.map((b) => b._id === id ? { ...b, status: newStatus } : b));
+      if (data.emailSent) {
+        toast.success(`Marked ${newStatus}. The guest has been emailed.`);
+      } else if (newStatus === 'Confirmed' || newStatus === 'Cancelled') {
+        toast(`Marked ${newStatus}. No email was sent, so please call the guest.`);
+      }
       
       // Update selected booking modal if open
       if (selectedBooking?._id === id) {

@@ -9,7 +9,7 @@ const RESEND_COOLDOWN_MS = 60 * 1000;
 const MAX_SENDS_PER_HOUR = 5;
 const MAX_ATTEMPTS = 5;
 
-export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export { BOOKING_EMAIL_REGEX as EMAIL_REGEX } from "@/lib/validation";
 
 export const normalizeEmail = (email: string) => email.trim().toLowerCase();
 

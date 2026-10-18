@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
+import { after, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import { Contact } from '@/models/Contact';
 import { consumeVerifiedEmail, EMAIL_REGEX, normalizeEmail } from '@/lib/otp';
+import { EMAIL_ERROR, isValidIndianMobile, normalizeIndianMobile, PHONE_ERROR } from '@/lib/validation';
 import { sendBookingRequestEmail } from '@/lib/mailer';
 import { GUEST_LIMIT_BY_ROOM } from '@/lib/rooms';
 
@@ -69,7 +70,7 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     const name = body.name?.trim();
-    const phone = body.phone?.trim();
+    const rawPhone = body.phone?.trim() || '';
     const email = normalizeEmail(body.email || '');
     const roomType = body.roomType?.trim() || 'Standard Ac Room';
     const guests = body.guests?.trim() || '2';
@@ -89,18 +90,20 @@ export async function POST(req: Request) {
     }
 
     // Validate essential fields
-    if (!name || !phone) {
+    if (!name || !rawPhone) {
       return NextResponse.json(
         { error: 'Name and phone number are required.' },
         { status: 400 }
       );
     }
 
+    if (!isValidIndianMobile(rawPhone)) {
+      return NextResponse.json({ error: PHONE_ERROR }, { status: 400 });
+    }
+    const phone = normalizeIndianMobile(rawPhone);
+
     if (!EMAIL_REGEX.test(email)) {
-      return NextResponse.json(
-        { error: 'Please enter a valid email address.' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: EMAIL_ERROR }, { status: 400 });
     }
 
     const validRooms = ["Super-Deluxe Room", "Standard Ac Room", "Non-Ac Deluxe"];
@@ -138,32 +141,32 @@ export async function POST(req: Request) {
       message: body.message || 'Instant AI Booking Request',
     });
 
-    // Email the guest a receipt. A failure here must not fail the booking itself.
-    try {
-      await sendBookingRequestEmail({
-        reference: String(newContact._id).slice(-6).toUpperCase(),
-        name,
-        email,
-        phone,
-        roomType: finalRoomType,
-        checkIn,
-        checkOut,
-        guests,
-      });
-    } catch (err) {
-      console.error('Booking email failed:', err);
-    }
-
-    // Fire Telegram alert (non-blocking)
-    sendTelegramAlert({
-      name,
-      email,
-      phone,
-      roomType: finalRoomType,
-      checkIn,
-      checkOut,
-      guests,
-      message: body.message,
+    // Telegram alert and guest receipt run after the response is sent. Vercel freezes a function
+    // once it responds, so an un-awaited fetch used to sit idle until the next request woke it up.
+    // after() keeps the function alive until both finish, and the guest isn't kept waiting.
+    after(async () => {
+      await Promise.allSettled([
+        sendTelegramAlert({
+          name,
+          email,
+          phone,
+          roomType: finalRoomType,
+          checkIn,
+          checkOut,
+          guests,
+          message: body.message,
+        }),
+        sendBookingRequestEmail({
+          reference: String(newContact._id).slice(-6).toUpperCase(),
+          name,
+          email,
+          phone,
+          roomType: finalRoomType,
+          checkIn,
+          checkOut,
+          guests,
+        }).catch((err) => console.error('Booking email failed:', err)),
+      ]);
     });
 
     return NextResponse.json(

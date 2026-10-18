@@ -6,6 +6,7 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import EmailOtpField from "@/components/EmailOtpField";
 import { bookingWhatsAppLink } from "@/lib/hotel";
+import { isValidIndianMobile, normalizeIndianMobile, PHONE_ERROR, sanitizePhoneInput } from "@/lib/validation";
 
 interface Message {
   id: string;
@@ -166,19 +167,11 @@ export default function AIChatbot() {
       return;
     }
 
-    const phoneTrimmed = bookingForm.phone.trim();
-    const digitsOnly = phoneTrimmed.replace(/\D/g, "");
-
-    // Validate 10-digit mobile number or +91 10-digit format
-    const isValidPhone =
-      (digitsOnly.length === 10 && /^[6-9]\d{9}$/.test(digitsOnly)) ||
-      (digitsOnly.length === 12 && digitsOnly.startsWith("91") && /^[6-9]\d{9}$/.test(digitsOnly.slice(2))) ||
-      (digitsOnly.length >= 10 && digitsOnly.length <= 13);
-
-    if (!phoneTrimmed || !isValidPhone) {
-      toast.error("Please enter a valid 10-digit phone number (e.g. 9876543210 or +919876543210).");
+    if (!isValidIndianMobile(bookingForm.phone)) {
+      toast.error(PHONE_ERROR);
       return;
     }
+    const phoneTrimmed = normalizeIndianMobile(bookingForm.phone);
 
     if (!bookingEmailVerified) {
       toast.error("Please verify your email with the 6-digit code first.");
@@ -479,20 +472,14 @@ export default function AIChatbot() {
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-semibold text-gray-700 mb-1">Phone Number (10 digits / +91)</label>
+                        <label className="block text-[11px] font-semibold text-gray-700 mb-1">Mobile Number (10 digits, India)</label>
                         <input
                           type="tel"
                           required
                           value={bookingForm.phone}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            const cleaned = val.startsWith("+")
-                              ? "+" + val.slice(1).replace(/\D/g, "")
-                              : val.replace(/\D/g, "");
-                            if (cleaned.length <= 14) {
-                              setBookingForm({ ...bookingForm, phone: cleaned });
-                            }
-                          }}
+                          inputMode="tel"
+                          maxLength={13}
+                          onChange={(e) => setBookingForm({ ...bookingForm, phone: sanitizePhoneInput(e.target.value) })}
                           placeholder="e.g. 9876543210 or +919876543210"
                           className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-royal-blue focus:outline-none bg-white"
                         />

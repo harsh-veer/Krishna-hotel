@@ -16,6 +16,7 @@ import {
   CheckCircle2
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { isValidIndianMobile, PHONE_ERROR, sanitizePhoneInput } from "@/lib/validation";
 import { ROOMS_DATA } from "@/lib/rooms";
 import EmailOtpField from "@/components/EmailOtpField";
 import HouseRules from "@/components/HouseRules";
@@ -93,7 +94,8 @@ export default function RoomDetail({ slug }: { slug: string }) {
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+    const { name } = e.target;
+    const value = name === "phone" ? sanitizePhoneInput(e.target.value) : e.target.value;
     setFormData((prev) => {
       const updated = { ...prev, [name]: value };
       if (name === "checkIn" && updated.checkOut && value >= updated.checkOut) {
@@ -105,6 +107,11 @@ export default function RoomDetail({ slug }: { slug: string }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isValidIndianMobile(formData.phone)) {
+      toast.error(PHONE_ERROR);
+      return;
+    }
 
     if (!emailVerified) {
       toast.error("Please verify your email with the 6-digit code first.");
@@ -289,7 +296,9 @@ export default function RoomDetail({ slug }: { slug: string }) {
                     required
                     value={formData.phone}
                     onChange={handleChange}
-                    placeholder="+91..."
+                    inputMode="tel"
+                    maxLength={13}
+                    placeholder="10-digit mobile"
                     className="w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-xs focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue bg-gray-50/50"
                   />
                 </div>

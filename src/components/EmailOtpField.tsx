@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import toast from "react-hot-toast";
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { EMAIL_ERROR, isValidBookingEmail } from "@/lib/validation";
 
 interface EmailOtpFieldProps {
     email: string;
@@ -51,8 +51,8 @@ export default function EmailOtpField({
     };
 
     const sendCode = async () => {
-        if (!EMAIL_REGEX.test(email.trim())) {
-            toast.error("Please enter a valid email address first.");
+        if (!isValidBookingEmail(email)) {
+            toast.error(EMAIL_ERROR);
             return;
         }
         setSending(true);
