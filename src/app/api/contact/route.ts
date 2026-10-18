@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import { Contact } from '@/models/Contact';
+import { consumeVerifiedEmail, EMAIL_REGEX, normalizeEmail } from '@/lib/otp';
 
 async function sendTelegramAlert(booking: {
   name: string;
@@ -67,7 +68,7 @@ export async function POST(req: Request) {
 
     const name = body.name?.trim();
     const phone = body.phone?.trim();
-    const email = body.email?.trim() || 'guest@krishnaahotel.in';
+    const email = normalizeEmail(body.email || '');
     const roomType = body.roomType?.trim() || 'Standard Ac Room';
     const guests = body.guests?.trim() || '2';
     let checkIn = body.checkIn?.trim();
@@ -93,10 +94,9 @@ export async function POST(req: Request) {
       );
     }
 
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
-    if (email && email !== 'guest@krishnaahotel.in' && !emailRegex.test(email)) {
+    if (!EMAIL_REGEX.test(email)) {
       return NextResponse.json(
-        { error: 'Email must be in a valid format including @gmail.com' },
+        { error: 'Please enter a valid email address.' },
         { status: 400 }
       );
     }
@@ -105,6 +105,14 @@ export async function POST(req: Request) {
     const finalRoomType = validRooms.includes(roomType) ? roomType : "Standard Ac Room";
 
     await dbConnect();
+
+    // Every booking needs an email address that passed OTP verification.
+    if (!(await consumeVerifiedEmail(email))) {
+      return NextResponse.json(
+        { error: 'Please verify your email with the code we sent before booking.', needsVerification: true },
+        { status: 403 }
+      );
+    }
 
     // Create the contact message
     const newContact = await Contact.create({

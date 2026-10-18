@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Maximize2, X, ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
 
 export default function Gallery() {
     const images = [
@@ -79,9 +80,12 @@ export default function Gallery() {
                 <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
                     {images.map((image, idx) => (
                         <div key={idx} className="relative group overflow-hidden rounded-2xl break-inside-avoid shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer" onClick={() => setSelectedIndex(idx)}>
-                            <img
+                            <Image
                                 src={image.src}
                                 alt={image.alt}
+                                width={800}
+                                height={600}
+                                sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                                 className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
                             />
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -135,10 +139,13 @@ export default function Gallery() {
                         }}
                         title="Click image for Next"
                     >
-                        <img
+                        <Image
                             src={currentImage.src}
                             alt={currentImage.alt}
-                            className="max-w-full max-h-[75vh] rounded-xl shadow-2xl object-contain animate-in fade-in zoom-in-95 duration-200"
+                            width={1600}
+                            height={1200}
+                            sizes="100vw"
+                            className="w-auto h-auto max-w-full max-h-[75vh] rounded-xl shadow-2xl object-contain animate-in fade-in zoom-in-95 duration-200"
                         />
                         
                         {/* Caption & Counter */}

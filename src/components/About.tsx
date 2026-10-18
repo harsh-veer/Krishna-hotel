@@ -2,6 +2,8 @@
 
 import { CheckCircle2, Star, Coffee, Wifi, Car, Shield } from "lucide-react";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT } from "@/lib/hotel";
 
 export default function About() {
     const highlights = [
@@ -26,12 +28,18 @@ export default function About() {
                         transition={{ duration: 0.6 }}
                         className="grid grid-cols-2 gap-4"
                     >
-                        <img
+                        <Image
+                            width={600}
+                            height={512}
+                            sizes="(min-width: 1024px) 25vw, 50vw"
                             src="/images/RUID782b578fd9e64411aedb00e919509b29.jpg"
                             alt="Hotel Reception"
                             className="rounded-2xl shadow-lg object-cover h-64 w-full"
                         />
-                        <img
+                        <Image
+                            width={600}
+                            height={512}
+                            sizes="(min-width: 1024px) 25vw, 50vw"
                             src="/images/RUID4542dd11e494471dab89a44c7c8115a3.jpg"
                             alt="Hotel Room Detail"
                             className="rounded-2xl shadow-lg object-cover h-64 w-full mt-8"
@@ -47,7 +55,7 @@ export default function About() {
                     >
                         <div className="inline-flex items-center space-x-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-sm font-medium text-yellow-800 mb-6">
                             <Star className="h-4 w-4 fill-gold text-gold" />
-                            <span>180+ Google Reviews (3.8 Rating)</span>
+                            <span>{GOOGLE_REVIEW_COUNT}+ Google Reviews ({GOOGLE_RATING.toFixed(1)} Rating)</span>
                         </div>
 
                         <h2 className="text-3xl font-bold font-heading text-gray-900 sm:text-4xl mb-6">

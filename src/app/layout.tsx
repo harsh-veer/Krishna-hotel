@@ -8,6 +8,7 @@ import AIChatbot from "@/components/AIChatbot";
 import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
+import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT, HOTEL_NAME, PHONE, SITE_URL } from "@/lib/hotel";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -21,15 +22,21 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://krishnaahotel.in"),
+  metadataBase: new URL(SITE_URL),
 
   title: "Krishna Hotel | Comfortable & Affordable Stay in Ambedkar Nagar",
 
   description:
     "Krishna Hotel offers comfortable and affordable AC rooms, free breakfast and family-friendly accommodation on the Ayodhya-Akbarpur Road in Ambedkar Nagar.",
 
-  alternates: {
-    canonical: "https://krishnaahotel.in/",
+  openGraph: {
+    type: "website",
+    siteName: HOTEL_NAME,
+    locale: "en_IN",
+    title: "Krishna Hotel | Comfortable & Affordable Stay in Ambedkar Nagar",
+    description:
+      "AC rooms from ₹999, free breakfast and safe parking on the Ayodhya-Akbarpur Road in Ambedkar Nagar.",
+    images: [{ url: "/images/gallery-daytime-front.jpg", alt: "Krishna Hotel front view" }],
   },
 
   robots: {
@@ -61,22 +68,32 @@ export default function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Hotel",
-    name: "Krishna Hotel",
+    name: HOTEL_NAME,
+    url: SITE_URL,
     description: "Comfortable & Affordable Stay in Ambedkar Nagar. AC Rooms, Free Breakfast, Family Friendly.",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "Ayodhya Road, Near Fire Station",
+      streetAddress: "Ayodhya-Akbarpur Road, Near Fire Station",
       addressLocality: "Ambedkar Nagar",
       addressRegion: "Uttar Pradesh",
+      postalCode: "224122",
       addressCountry: "IN"
     },
-    starRating: {
-      "@type": "Rating",
-      ratingValue: "3.8"
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: GOOGLE_RATING,
+      reviewCount: GOOGLE_REVIEW_COUNT,
+      bestRating: 5
     },
-    telephone: "+918604680149",
-    image: "https://krishnahotel.com/images/pexels-jplenio-1435075.jpg",
-    priceRange: "₹999 - ₹1500"
+    telephone: PHONE,
+    email: "krishnahotel10851@gmail.com",
+    image: `${SITE_URL}/images/gallery-daytime-front.jpg`,
+    priceRange: "₹999 - ₹1500",
+    checkinTime: "12:00",
+    checkoutTime: "11:00",
+    amenityFeature: ["Free parking", "Free Wi-Fi", "Air conditioning", "Restaurant", "Banquet hall", "24-hour room service"].map(
+      (name) => ({ "@type": "LocationFeatureSpecification", name, value: true })
+    )
   };
 
   return (

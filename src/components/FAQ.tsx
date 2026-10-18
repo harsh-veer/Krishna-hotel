@@ -27,11 +27,26 @@ const faqs = [
     }
 ];
 
+// Only the open answer is in the HTML, so all answers also go out as FAQPage data for search engines.
+const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+        "@type": "Question",
+        name: faq.question,
+        acceptedAnswer: { "@type": "Answer", text: faq.answer },
+    })),
+};
+
 export default function FAQ() {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
 
     return (
         <section className="py-20 bg-white">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+            />
             <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-12">
                     <div className="inline-flex items-center justify-center rounded-full bg-royal-blue/10 p-3 mb-4 text-royal-blue">
@@ -53,6 +68,7 @@ export default function FAQ() {
                         >
                             <button
                                 className="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none"
+                                aria-expanded={openIndex === index}
                                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                             >
                                 <span className="text-lg font-semibold text-gray-900">{faq.question}</span>

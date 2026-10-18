@@ -34,7 +34,7 @@ export default function Navbar() {
                     <Link href="/#gallery" className="text-gray-700 hover:text-royal-blue font-medium transition-colors">Gallery</Link>
                     <Link href="/#location" className="text-gray-700 hover:text-royal-blue font-medium transition-colors">Location</Link>
                     <Link
-                        href="/feedback"
+                        href="/#reviews"
                         className="inline-flex items-center space-x-1.5 text-gray-700 hover:text-royal-blue font-medium transition-colors"
                     >
                         <MessageSquare className="h-4 w-4" />
@@ -71,7 +71,7 @@ export default function Navbar() {
                     <Link href="/#amenities" onClick={() => setMobileOpen(false)} className="block text-gray-700 hover:text-royal-blue font-medium py-2 transition-colors">Amenities</Link>
                     <Link href="/#gallery" onClick={() => setMobileOpen(false)} className="block text-gray-700 hover:text-royal-blue font-medium py-2 transition-colors">Gallery</Link>
                     <Link href="/#location" onClick={() => setMobileOpen(false)} className="block text-gray-700 hover:text-royal-blue font-medium py-2 transition-colors">Location</Link>
-                    <Link href="/feedback" onClick={() => setMobileOpen(false)} className="flex items-center space-x-1.5 text-gray-700 hover:text-royal-blue font-medium py-2 transition-colors">
+                    <Link href="/#reviews" onClick={() => setMobileOpen(false)} className="flex items-center space-x-1.5 text-gray-700 hover:text-royal-blue font-medium py-2 transition-colors">
                         <MessageSquare className="h-4 w-4" />
                         <span>Leave a Review</span>
                     </Link>

@@ -3,6 +3,7 @@
 import { Users, BedDouble, Bath, Tv } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 
 const toSlug = (name: string) =>
     name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
@@ -40,7 +41,7 @@ export default function Rooms() {
             id: 3,
             name: "Non-Ac Deluxe",
             price: "₹999",
-            image: "/images/WhatsApp Image 2026-04-23 at 23.40.51.jpeg",
+            image: "/images/non-ac-deluxe-room.jpeg",
             description: "Experience luxury with a dedicated seating area and refined decor.",
             features: [
                 { icon: <BedDouble className="h-4 w-4" />, text: "1 Double Bed" },
@@ -84,9 +85,11 @@ export default function Rooms() {
                                         Most Popular
                                     </div>
                                 )}
-                                <img
+                                <Image
                                     src={room.image}
                                     alt={room.name}
+                                    fill
+                                    sizes="(min-width: 768px) 33vw, 100vw"
                                     className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
                             </div>

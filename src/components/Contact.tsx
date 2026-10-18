@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Mail, Phone, Calendar, Users, Send, BedDouble } from "lucide-react";
 import toast from "react-hot-toast";
+import EmailOtpField from "@/components/EmailOtpField";
 
 export default function Contact() {
     const [formData, setFormData] = useState({
@@ -17,6 +18,7 @@ export default function Contact() {
     });
 
     const [isLoading, setIsLoading] = useState(false);
+    const [emailVerified, setEmailVerified] = useState(false);
     const [availability, setAvailability] = useState<{
         checked: boolean;
         loading: boolean;
@@ -108,9 +110,8 @@ export default function Contact() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
-        if (!emailRegex.test(formData.email.trim())) {
-            toast.error('Please enter a valid Gmail address (must include @gmail.com)', {
+        if (!emailVerified) {
+            toast.error('Please verify your email with the 6-digit code first.', {
                 duration: 5000,
                 position: 'bottom-center',
             });
@@ -130,6 +131,7 @@ export default function Contact() {
 
             if (!response.ok) {
                 const data = await response.json();
+                if (data.needsVerification) setEmailVerified(false);
                 throw new Error(data.error || 'Failed to submit form');
             }
 
@@ -139,6 +141,7 @@ export default function Contact() {
             });
             
             setFormData({ name: "", email: "", phone: "", roomType: "Super-Deluxe Room", checkIn: "", checkOut: "", guests: "1", message: "" });
+            setEmailVerified(false);
             setAvailability({ checked: false, loading: false, available: false, remaining: 0, total: 0 });
         } catch (err: any) {
             toast.error(err.message || 'Something went wrong. Please try again.', {
@@ -235,21 +238,12 @@ export default function Contact() {
                                         />
                                     </div>
                                 </div>
-                                <div>
-                                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        required
-                                        pattern="[a-zA-Z0-9._%+-]+@gmail\.com"
-                                        title="Please enter a valid email address ending with @gmail.com"
-                                        className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue bg-gray-50/50"
-                                        placeholder="krishnahotel10851@gmail.com"
-                                    />
-                                </div>
+                                <EmailOtpField
+                                    email={formData.email}
+                                    onEmailChange={(email) => setFormData(prev => ({ ...prev, email }))}
+                                    verified={emailVerified}
+                                    onVerifiedChange={setEmailVerified}
+                                />
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     <div>
@@ -367,10 +361,10 @@ export default function Contact() {
 
                                 <button
                                     type="submit"
-                                    disabled={isLoading || (availability.checked && !availability.available)}
+                                    disabled={isLoading || !emailVerified || (availability.checked && !availability.available)}
                                     className="w-full rounded-lg bg-royal-blue px-4 py-3.5 text-sm font-bold text-white shadow-md hover:bg-royal-blue-light transition-all flex items-center justify-center space-x-2 disabled:opacity-75 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:hover:bg-gray-400"
                                 >
-                                    <span>{isLoading ? "Sending..." : (availability.checked && !availability.available) ? "Sold Out for Selected Dates" : "Send Booking Request"}</span>
+                                    <span>{isLoading ? "Sending..." : (availability.checked && !availability.available) ? "Sold Out for Selected Dates" : !emailVerified ? "Verify Email to Continue" : "Send Booking Request"}</span>
                                     {!isLoading && <Send className="h-4 w-4" />}
                                 </button>
                                 <p className="text-xs text-center text-gray-500 mt-3">We will call you back to confirm availability and process the booking.</p>

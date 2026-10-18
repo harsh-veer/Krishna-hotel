@@ -1,4 +1,5 @@
 import { Coffee, Utensils, Clock, CheckCircle2 } from "lucide-react";
+import Image from "next/image";
 
 export default function Dining() {
     const highlights = [
@@ -71,7 +72,9 @@ export default function Dining() {
                     <div className="order-1 lg:order-2 relative">
                         {/* We use a placeholder image URL for the food/dining or reuse a nice room interior if food is unavailable. For now, we will use a high quality unsplash food image. */}
                         <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3]">
-                            <img
+                            <Image
+                                fill
+                                sizes="(min-width: 1024px) 50vw, 100vw"
                                 src="/images/indian-food-dining.jpg"
                                 alt="Fresh North Indian Thali & Breakfast Spread"
                                 className="w-full h-full object-cover"

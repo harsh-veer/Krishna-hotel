@@ -1,7 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { use, useState, useEffect } from "react";
 import { Star, Award, CheckCircle, ArrowLeft, MessageSquare } from "lucide-react";
 import toast from "react-hot-toast";
 import Link from "next/link";
@@ -12,10 +11,7 @@ interface BookingDetails {
   status: string;
 }
 
-function FeedbackFormContent() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const bookingId = searchParams.get("bookingId");
+function FeedbackFormContent({ bookingId }: { bookingId: string | null }) {
 
   const [formData, setFormData] = useState({
     name: "",
@@ -222,17 +218,17 @@ function FeedbackFormContent() {
   );
 }
 
-export default function FeedbackPage() {
+// Reading bookingId from the page's searchParams (not useSearchParams) lets the form
+// render on the server, so visitors and crawlers never see a stuck loading screen.
+export default function FeedbackPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ bookingId?: string | string[] }>;
+}) {
+  const { bookingId } = use(searchParams);
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
-      <Suspense fallback={
-        <div className="py-12 flex flex-col items-center justify-center space-y-3">
-          <span className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-royal-blue border-t-transparent" />
-          <span className="text-sm text-gray-500 font-medium">Loading feedback portal...</span>
-        </div>
-      }>
-        <FeedbackFormContent />
-      </Suspense>
+      <FeedbackFormContent bookingId={typeof bookingId === "string" ? bookingId : null} />
     </div>
   );
 }

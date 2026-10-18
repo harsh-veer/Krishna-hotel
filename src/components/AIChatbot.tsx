@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Sparkles, Send, X, Bot, Phone, ChevronDown, MapPin, Calendar, BedDouble, RotateCcw } from "lucide-react";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import EmailOtpField from "@/components/EmailOtpField";
 
 interface Message {
   id: string;
@@ -41,6 +42,7 @@ export default function AIChatbot() {
   const [bookingForm, setBookingForm] = useState({
     name: "",
     phone: "",
+    email: "",
     roomType: "Standard Ac Room",
     checkIn: "",
     checkOut: "",
@@ -48,6 +50,7 @@ export default function AIChatbot() {
   });
   const [isSubmittingBooking, setIsSubmittingBooking] = useState(false);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  const [bookingEmailVerified, setBookingEmailVerified] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -176,6 +179,11 @@ export default function AIChatbot() {
       return;
     }
 
+    if (!bookingEmailVerified) {
+      toast.error("Please verify your email with the 6-digit code first.");
+      return;
+    }
+
     setIsSubmittingBooking(true);
 
     try {
@@ -188,7 +196,7 @@ export default function AIChatbot() {
         body: JSON.stringify({
           name: nameTrimmed,
           phone: phoneTrimmed,
-          email: "booking-via-ai-chatbot@krishnaahotel.in",
+          email: bookingForm.email.trim(),
           roomType: bookingForm.roomType,
           checkIn: checkInDate,
           checkOut: checkOutDate,
@@ -199,6 +207,7 @@ export default function AIChatbot() {
 
       const resData = await res.json();
       if (!res.ok) {
+        if (resData.needsVerification) setBookingEmailVerified(false);
         throw new Error(resData.error || "Booking submission failed.");
       }
 
@@ -488,6 +497,18 @@ export default function AIChatbot() {
                         />
                       </div>
 
+                      <EmailOtpField
+                        id="chat-email"
+                        label="Email (we'll send a 6-digit code)"
+                        email={bookingForm.email}
+                        onEmailChange={(email) => setBookingForm((prev) => ({ ...prev, email }))}
+                        verified={bookingEmailVerified}
+                        onVerifiedChange={setBookingEmailVerified}
+                        labelClassName="block text-[11px] font-semibold text-gray-700 mb-1"
+                        inputClassName="w-full min-w-0 rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-royal-blue focus:outline-none bg-white"
+                        buttonClassName="shrink-0 rounded-lg bg-royal-blue px-2.5 text-[11px] font-semibold text-white hover:bg-royal-blue-light disabled:opacity-60 disabled:cursor-not-allowed"
+                      />
+
                       <div className="grid grid-cols-2 gap-2">
                         <div>
                           <label className="block text-[11px] font-semibold text-gray-700 mb-1">Check-in Date</label>
@@ -534,8 +555,8 @@ export default function AIChatbot() {
                       <div className="flex gap-2 pt-1">
                         <button
                           type="submit"
-                          disabled={isSubmittingBooking}
-                          className="flex-1 bg-royal-blue text-white font-bold py-2 rounded-lg text-xs hover:bg-royal-blue-light transition-colors flex items-center justify-center gap-1 shadow-sm"
+                          disabled={isSubmittingBooking || !bookingEmailVerified}
+                          className="flex-1 disabled:opacity-60 disabled:cursor-not-allowed bg-royal-blue text-white font-bold py-2 rounded-lg text-xs hover:bg-royal-blue-light transition-colors flex items-center justify-center gap-1 shadow-sm"
                         >
                           {isSubmittingBooking ? "Booking..." : "Confirm Booking Request"}
                         </button>
