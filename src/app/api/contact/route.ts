@@ -1,4 +1,4 @@
-import { after, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import { Contact } from '@/models/Contact';
 import { consumeVerifiedEmail, EMAIL_REGEX, normalizeEmail } from '@/lib/otp';
@@ -141,33 +141,36 @@ export async function POST(req: Request) {
       message: body.message || 'Instant AI Booking Request',
     });
 
-    // Telegram alert and guest receipt run after the response is sent. Vercel freezes a function
-    // once it responds, so an un-awaited fetch used to sit idle until the next request woke it up.
-    // after() keeps the function alive until both finish, and the guest isn't kept waiting.
-    after(async () => {
-      await Promise.allSettled([
-        sendTelegramAlert({
-          name,
-          email,
-          phone,
-          roomType: finalRoomType,
-          checkIn,
-          checkOut,
-          guests,
-          message: body.message,
-        }),
-        sendBookingRequestEmail({
-          reference: String(newContact._id).slice(-6).toUpperCase(),
-          name,
-          email,
-          phone,
-          roomType: finalRoomType,
-          checkIn,
-          checkOut,
-          guests,
-        }).catch((err) => console.error('Booking email failed:', err)),
-      ]);
-    });
+    // Send the Telegram alert and the guest's receipt together, and wait for both before replying.
+    // Waiting (instead of after() or a fire-and-forget call) guarantees Vercel doesn't stop the
+    // function before Gmail has accepted the email. A failure here must not fail the booking itself.
+    const [, emailResult] = await Promise.allSettled([
+      sendTelegramAlert({
+        name,
+        email,
+        phone,
+        roomType: finalRoomType,
+        checkIn,
+        checkOut,
+        guests,
+        message: body.message,
+      }),
+      sendBookingRequestEmail({
+        reference: String(newContact._id).slice(-6).toUpperCase(),
+        name,
+        email,
+        phone,
+        roomType: finalRoomType,
+        checkIn,
+        checkOut,
+        guests,
+      }),
+    ]);
+    if (emailResult.status === 'rejected') {
+      console.error('Booking email failed:', emailResult.reason);
+    } else {
+      console.log(`Booking email sent to ${email}`);
+    }
 
     return NextResponse.json(
       { message: 'Your booking request has been sent successfully!', data: newContact },

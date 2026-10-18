@@ -98,6 +98,7 @@ export async function PATCH(
           guests: previous.guests,
           status,
         });
+        console.log(`Status email (${status}) sent: ${emailSent} to ${previous.email}`);
       } catch (mailError) {
         console.error('Status email failed:', mailError);
       }
