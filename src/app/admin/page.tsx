@@ -204,9 +204,10 @@ export default function AdminDashboard() {
     setError(null);
 
     try {
-      const response = await adminFetch("/api/admin/login", {
+      const response = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
       });
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
