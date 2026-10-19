@@ -243,10 +243,10 @@ export default function Contact() {
                                             value={formData.name}
                                             onChange={handleChange}
                                             required
-                                            inputMode="tel"
-                                            maxLength={13}
+                                            autoComplete="name"
+                                            maxLength={60}
                                             className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue bg-gray-50/50"
-                                            placeholder="Krishna Hotel"
+                                            placeholder={t("Your full name", "आपका पूरा नाम")}
                                         />
                                     </div>
                                     <div>
@@ -258,6 +258,9 @@ export default function Contact() {
                                             value={formData.phone}
                                             onChange={handleChange}
                                             required
+                                            inputMode="tel"
+                                            autoComplete="tel"
+                                            maxLength={13}
                                             className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue bg-gray-50/50"
                                             placeholder={t("10-digit mobile, e.g. 9876543210", "10 अंक, जैसे 9876543210")}
                                         />
