@@ -1,42 +1,46 @@
+"use client";
+
+import { useLang } from "@/lib/i18n";
 import { MapPin, Sparkles, IndianRupee, ShieldCheck, Utensils, PartyPopper } from "lucide-react";
 
 export default function Features() {
+    const { t } = useLang();
     const features = [
         {
             icon: <MapPin className="h-8 w-8 text-royal-blue" />,
-            title: "Strategic Ayodhya Highway Location",
-            description: "Directly located on the Ayodhya-Akbarpur Road near Fire Station. Perfect stop for Ayodhya Ram Mandir pilgrims & family road trips.",
-            badge: "Prime Location"
+            title: t("Strategic Ayodhya Highway Location", "अयोध्या हाईवे पर बढ़िया लोकेशन"),
+            description: t("Directly located on the Ayodhya-Akbarpur Road near Fire Station. Perfect stop for Ayodhya Ram Mandir pilgrims & family road trips.", "अयोध्या-अकबरपुर रोड पर, फ़ायर स्टेशन के पास। अयोध्या राम मंदिर के दर्शन को जाने वाले श्रद्धालुओं और परिवार के साथ सफ़र के लिए सही पड़ाव।"),
+            badge: t("Prime Location", "मुख्य लोकेशन")
         },
         {
             icon: <Sparkles className="h-8 w-8 text-gold" />,
-            title: "Unmatched Cleanliness & Hygiene",
-            description: "Spotless AC rooms, fresh sanitized linen, clean modern bathrooms, and daily housekeeping for a refreshing stay.",
-            badge: "100% Sanitized"
+            title: t("Unmatched Cleanliness & Hygiene", "बेहतरीन साफ़-सफ़ाई"),
+            description: t("Spotless AC rooms, fresh sanitized linen, clean modern bathrooms, and daily housekeeping for a refreshing stay.", "चमचमाते एसी कमरे, धुली हुई साफ़ चादरें, साफ़ आधुनिक बाथरूम और रोज़ाना कमरे की सफ़ाई।"),
+            badge: t("100% Sanitized", "100% सैनिटाइज़्ड")
         },
         {
             icon: <IndianRupee className="h-8 w-8 text-green-600" />,
-            title: "Budget-Friendly Luxury",
-            description: "Enjoy premium AC comfort, high-speed Wi-Fi, and top-tier amenities at transparent prices starting from ₹999 - ₹1,500/night.",
-            badge: "Best Value"
+            title: t("Budget-Friendly Luxury", "कम बजट में आराम"),
+            description: t("Enjoy premium AC comfort, high-speed Wi-Fi, and top-tier amenities at transparent prices starting from ₹999 - ₹1,500/night.", "एसी का आराम, हाई-स्पीड वाई-फ़ाई और अच्छी सुविधाएँ, साफ़ दामों पर: ₹999 - ₹1,500 प्रति रात।"),
+            badge: t("Best Value", "पैसा वसूल")
         },
         {
             icon: <Utensils className="h-8 w-8 text-amber-600" />,
-            title: "Pure Veg Krishna Restaurant",
-            description: "In-house restaurant serving delicious North Indian dishes, thali, snacks, and 24/7 hot room service straight to your room.",
-            badge: "Pure Vegetarian"
+            title: t("Pure Veg Krishna Restaurant", "शुद्ध शाकाहारी कृष्णा रेस्टोरेंट"),
+            description: t("In-house restaurant serving delicious North Indian dishes, thali, snacks, and 24/7 hot room service straight to your room.", "होटल का अपना रेस्टोरेंट, जहाँ स्वादिष्ट उत्तर भारतीय खाना, थाली और नाश्ता मिलता है, साथ में 24/7 गरम खाना सीधे आपके कमरे तक।"),
+            badge: t("Pure Vegetarian", "शुद्ध शाकाहारी")
         },
         {
             icon: <PartyPopper className="h-8 w-8 text-purple-600" />,
-            title: "Grand Banquet & Event Hall",
-            description: "Spacious venue with custom stage decorations, balloon arches, and seating for birthdays, weddings, and family events.",
-            badge: "Event Space"
+            title: t("Grand Banquet & Event Hall", "भव्य बैंक्वेट और इवेंट हॉल"),
+            description: t("Spacious venue with custom stage decorations, balloon arches, and seating for birthdays, weddings, and family events.", "जन्मदिन, शादी और पारिवारिक कार्यक्रमों के लिए बड़ा हॉल, स्टेज सजावट, गुब्बारों की सजावट और बैठने की व्यवस्था के साथ।"),
+            badge: t("Event Space", "इवेंट हॉल")
         },
         {
             icon: <ShieldCheck className="h-8 w-8 text-blue-600" />,
-            title: "24/7 Security & Hospitality",
-            description: "24/7 front desk, power backup generator, CCTV security, free parking, and warm family-friendly hospitality.",
-            badge: "Safe Stay"
+            title: t("24/7 Security & Hospitality", "24/7 सुरक्षा और सेवा"),
+            description: t("24/7 front desk, power backup generator, CCTV security, free parking, and warm family-friendly hospitality.", "24/7 रिसेप्शन, जनरेटर पावर बैकअप, सीसीटीवी सुरक्षा, मुफ़्त पार्किंग और परिवार जैसी मेहमाननवाज़ी।"),
+            badge: t("Safe Stay", "सुरक्षित ठहराव")
         },
     ];
 
@@ -45,13 +49,13 @@ export default function Features() {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="text-center max-w-3xl mx-auto mb-16">
                     <span className="mb-4 inline-block rounded-full bg-gold/20 px-4 py-1.5 text-xs font-bold tracking-wider text-yellow-900 uppercase shadow-sm">
-                        Why Customers Prefer Us
+                        {t("Why Customers Prefer Us", "मेहमान हमें क्यों चुनते हैं")}
                     </span>
                     <h2 className="text-3xl font-bold font-heading text-gray-900 sm:text-4xl">
-                        The Krishna Hotel Advantage
+                        {t("The Krishna Hotel Advantage", "कृष्णा होटल की ख़ासियत")}
                     </h2>
                     <p className="mt-4 text-lg text-gray-600">
-                        Discover why road travelers, families, and Ayodhya Ram Mandir pilgrims consistently rank Krishna Hotel as their top choice.
+                        {t("Discover why road travelers, families, and Ayodhya Ram Mandir pilgrims consistently rank Krishna Hotel as their top choice.", "जानिए क्यों सड़क यात्री, परिवार और अयोध्या राम मंदिर के श्रद्धालु बार-बार कृष्णा होटल को ही चुनते हैं।")}
                     </p>
                 </div>
 

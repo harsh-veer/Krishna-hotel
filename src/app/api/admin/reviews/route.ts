@@ -1,19 +1,12 @@
 import { NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/adminAuth';
 import dbConnect from '@/lib/mongodb';
 import { Review } from '@/models/Review';
 
-export async function POST(req: Request) {
+export async function POST() {
   try {
-    const { password } = await req.json();
-
-    const adminPassword = process.env.ADMIN_PASSWORD;
-
-    if (!adminPassword || password !== adminPassword) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Invalid password.' },
-        { status: 401 }
-      );
-    }
+    const denied = await requireAdmin();
+    if (denied) return denied;
 
     await dbConnect();
 

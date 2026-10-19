@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import toast from "react-hot-toast";
 
-import { EMAIL_ERROR, isValidBookingEmail } from "@/lib/validation";
+import { isValidBookingEmail } from "@/lib/validation";
+import { useLang } from "@/lib/i18n";
+import { MSG } from "@/lib/i18n/messages";
 
 interface EmailOtpFieldProps {
     email: string;
@@ -25,11 +27,12 @@ export default function EmailOtpField({
     verified,
     onVerifiedChange,
     id = "email",
-    label = "Email Address",
+    label,
     labelClassName = "block text-sm font-medium text-gray-700 mb-1",
     inputClassName = "w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue bg-gray-50/50",
     buttonClassName = "shrink-0 rounded-lg bg-royal-blue px-4 text-sm font-semibold text-white hover:bg-royal-blue-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed",
 }: EmailOtpFieldProps) {
+    const { t } = useLang();
     const [codeSent, setCodeSent] = useState(false);
     const [code, setCode] = useState("");
     const [sending, setSending] = useState(false);
@@ -52,7 +55,7 @@ export default function EmailOtpField({
 
     const sendCode = async () => {
         if (!isValidBookingEmail(email)) {
-            toast.error(EMAIL_ERROR);
+            toast.error(t(MSG.emailError));
             return;
         }
         setSending(true);
@@ -65,13 +68,16 @@ export default function EmailOtpField({
             const data = await res.json();
             if (!res.ok) {
                 if (data.retryAfter) setCooldown(data.retryAfter);
-                throw new Error(data.error || "Could not send the code.");
+                throw new Error(data.error || t("Could not send the code.", "कोड नहीं भेजा जा सका।"));
             }
             setCodeSent(true);
             setCooldown(60);
-            toast.success(`Code sent to ${email.trim()}. Check your inbox and spam folder.`);
+            toast.success(t(
+                `Code sent to ${email.trim()}. Check your inbox and spam folder.`,
+                `${email.trim()} पर कोड भेज दिया गया है। अपना इनबॉक्स और स्पैम फ़ोल्डर देखें।`
+            ));
         } catch (err: any) {
-            toast.error(err.message || "Could not send the code.");
+            toast.error(err.message || t("Could not send the code.", "कोड नहीं भेजा जा सका।"));
         } finally {
             setSending(false);
         }
@@ -86,11 +92,11 @@ export default function EmailOtpField({
                 body: JSON.stringify({ email: email.trim(), code: code.trim() }),
             });
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Verification failed.");
+            if (!res.ok) throw new Error(data.error || t("Verification failed.", "वेरिफ़िकेशन नहीं हो सका।"));
             onVerifiedChange(true);
-            toast.success("Email verified.");
+            toast.success(t("Email verified.", "ईमेल वेरिफ़ाई हो गया।"));
         } catch (err: any) {
-            toast.error(err.message || "Verification failed.");
+            toast.error(err.message || t("Verification failed.", "वेरिफ़िकेशन नहीं हो सका।"));
         } finally {
             setVerifying(false);
         }
@@ -98,7 +104,7 @@ export default function EmailOtpField({
 
     return (
         <div className="space-y-2">
-            <label htmlFor={id} className={labelClassName}>{label}</label>
+            <label htmlFor={id} className={labelClassName}>{label ?? t("Email Address", "ईमेल पता")}</label>
             <div className="flex gap-2">
                 <input
                     type="email"
@@ -113,11 +119,17 @@ export default function EmailOtpField({
                 />
                 {verified ? (
                     <span className="shrink-0 inline-flex items-center gap-1 px-2 text-sm font-semibold text-green-700">
-                        <CheckCircle2 className="h-4 w-4" /> Verified
+                        <CheckCircle2 className="h-4 w-4" /> {t("Verified", "वेरिफ़ाइड")}
                     </span>
                 ) : (
                     <button type="button" onClick={sendCode} disabled={sending || cooldown > 0} className={buttonClassName}>
-                        {sending ? "Sending..." : cooldown > 0 && codeSent ? `Resend ${cooldown}s` : codeSent ? "Resend" : "Send code"}
+                        {sending
+                            ? t("Sending...", "भेजा जा रहा है...")
+                            : cooldown > 0 && codeSent
+                              ? t(`Resend ${cooldown}s`, `दोबारा भेजें ${cooldown}s`)
+                              : codeSent
+                                ? t("Resend", "दोबारा भेजें")
+                                : t("Send code", "कोड भेजें")}
                     </button>
                 )}
             </div>
@@ -138,11 +150,11 @@ export default function EmailOtpField({
                             }
                         }}
                         className={`${inputClassName} tracking-[0.4em] font-semibold`}
-                        placeholder="6-digit code"
-                        aria-label="Verification code"
+                        placeholder={t("6-digit code", "6 अंकों का कोड")}
+                        aria-label={t("Verification code", "वेरिफ़िकेशन कोड")}
                     />
                     <button type="button" onClick={verifyCode} disabled={verifying || code.length !== 6} className={buttonClassName}>
-                        {verifying ? "Checking..." : "Verify"}
+                        {verifying ? t("Checking...", "जाँच हो रही है...") : t("Verify", "वेरिफ़ाई करें")}
                     </button>
                 </div>
             )}

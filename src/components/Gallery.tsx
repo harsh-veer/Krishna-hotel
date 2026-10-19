@@ -3,8 +3,45 @@
 import { useState, useEffect } from "react";
 import { Maximize2, X, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
+import { useLang } from "@/lib/i18n";
+
+// Hindi captions for the gallery labels below; anything not listed shows in English.
+const CATEGORY_HI: Record<string, string> = {
+    rooms: "कमरे",
+    room: "कमरा",
+    food: "खाना",
+    view: "नज़ारा",
+    banquet: "बैंक्वेट",
+    restaurant: "रेस्टोरेंट",
+    hotel: "होटल",
+};
+
+const CAPTION_HI: Record<string, string> = {
+    "Deluxe AC Master Bedroom": "डीलक्स एसी बेडरूम",
+    "Special Paneer Butter Masala": "स्पेशल पनीर बटर मसाला",
+    "Hotel Front View": "होटल का सामने का नज़ारा",
+    "Banquet Hall and Event Venue": "बैंक्वेट हॉल और इवेंट वेन्यू",
+    "Front View": "सामने का नज़ारा",
+    "Banquet Hall Event Seating & Decor": "बैंक्वेट हॉल की बैठक और सजावट",
+    "Super-Deluxe Room": "सुपर डीलक्स रूम",
+    "Super Deluxe Room": "सुपर डीलक्स रूम",
+    "Standard Ac Room": "स्टैंडर्ड एसी रूम",
+    "Banquet Hall": "बैंक्वेट हॉल",
+    "Banquet Hall & Event Seating": "बैंक्वेट हॉल और बैठक",
+    "Dining View": "डाइनिंग का नज़ारा",
+    "Restaurant View": "रेस्टोरेंट का नज़ारा",
+    "Banquet Hall - Aisle": "बैंक्वेट हॉल - रास्ता",
+    "Banquet Hall - Seating": "बैंक्वेट हॉल - बैठक",
+    "Banquet Hall - Stage Decor": "बैंक्वेट हॉल - स्टेज सजावट",
+    "Banquet Hall - Full View": "बैंक्वेट हॉल - पूरा नज़ारा",
+    "Hotel Breakfast": "होटल का नाश्ता",
+    "Hotel Brunch": "होटल का ब्रंच",
+};
 
 export default function Gallery() {
+    const { lang, t } = useLang();
+    const category = (c: string) => (lang === "hi" ? CATEGORY_HI[c.toLowerCase()] ?? c : c);
+    const caption = (alt: string) => (lang === "hi" ? CAPTION_HI[alt] ?? alt : alt);
     const images = [
         { src: "/images/hero-room-banner.jpg", alt: "Deluxe AC Master Bedroom", category: "Rooms" },
         { src: "/images/paneer-butter-masala.jpg", alt: "Special Paneer Butter Masala", category: "Food" },
@@ -67,13 +104,16 @@ export default function Gallery() {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="text-center max-w-3xl mx-auto mb-16">
                     <span className="mb-4 inline-block rounded-full bg-royal-blue/10 px-3 py-1 text-sm font-semibold tracking-wider text-royal-blue uppercase">
-                        Our Gallery
+                        {t("Our Gallery", "हमारी गैलरी")}
                     </span>
                     <h2 className="text-3xl font-bold font-heading text-gray-900 sm:text-4xl">
-                        A Glimpse of Your Stay
+                        {t("A Glimpse of Your Stay", "आपके ठहराव की एक झलक")}
                     </h2>
                     <p className="mt-4 text-lg text-gray-600">
-                        Take a look at our rooms, reception area, and well-maintained facilities designed for your comfort.
+                        {t(
+                            "Take a look at our rooms, reception area, and well-maintained facilities designed for your comfort.",
+                            "हमारे कमरे, रिसेप्शन और आपके आराम के लिए बनी साफ़-सुथरी सुविधाओं पर एक नज़र डालें।"
+                        )}
                     </p>
                 </div>
 
@@ -82,7 +122,7 @@ export default function Gallery() {
                         <div key={idx} className="relative group overflow-hidden rounded-2xl break-inside-avoid shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer" onClick={() => setSelectedIndex(idx)}>
                             <Image
                                 src={image.src}
-                                alt={image.alt}
+                                alt={caption(image.alt)}
                                 width={800}
                                 height={600}
                                 sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
@@ -92,8 +132,8 @@ export default function Gallery() {
                                 <Maximize2 className="text-white h-8 w-8" />
                             </div>
                             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white">
-                                <span className="text-sm font-semibold uppercase tracking-wider text-gold">{image.category}</span>
-                                <p className="font-medium mt-1">{image.alt}</p>
+                                <span className="text-sm font-semibold uppercase tracking-wider text-gold">{category(image.category)}</span>
+                                <p className="font-medium mt-1">{caption(image.alt)}</p>
                             </div>
                         </div>
                     ))}
@@ -113,7 +153,7 @@ export default function Gallery() {
                             e.stopPropagation();
                             setSelectedIndex(null);
                         }}
-                        title="Close (Esc)"
+                        title={t("Close (Esc)", "बंद करें (Esc)")}
                     >
                         <X className="h-6 w-6 sm:h-8 sm:w-8" />
                     </button>
@@ -125,7 +165,7 @@ export default function Gallery() {
                             e.stopPropagation();
                             handlePrev();
                         }}
-                        title="Previous Image (Left Arrow)"
+                        title={t("Previous Image (Left Arrow)", "पिछली फ़ोटो (बायाँ तीर)")}
                     >
                         <ChevronLeft className="h-8 w-8 sm:h-10 sm:w-10" />
                     </button>
@@ -137,11 +177,11 @@ export default function Gallery() {
                             e.stopPropagation();
                             handleNext();
                         }}
-                        title="Click image for Next"
+                        title={t("Click image for Next", "अगली फ़ोटो के लिए क्लिक करें")}
                     >
                         <Image
                             src={currentImage.src}
-                            alt={currentImage.alt}
+                            alt={caption(currentImage.alt)}
                             width={1600}
                             height={1200}
                             sizes="100vw"
@@ -151,10 +191,10 @@ export default function Gallery() {
                         {/* Caption & Counter */}
                         <div className="mt-4 text-center text-white" onClick={(e) => e.stopPropagation()}>
                             <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-gold bg-black/50 px-3 py-1 rounded-full border border-gold/30">
-                                {currentImage.category} • {selectedIndex + 1} of {images.length}
+                                {category(currentImage.category)} • {selectedIndex + 1} {t("of", "/")} {images.length}
                             </span>
                             <p className="font-medium text-base sm:text-lg mt-2 text-gray-200">
-                                {currentImage.alt}
+                                {caption(currentImage.alt)}
                             </p>
                         </div>
                     </div>
@@ -166,7 +206,7 @@ export default function Gallery() {
                             e.stopPropagation();
                             handleNext();
                         }}
-                        title="Next Image (Right Arrow / Click)"
+                        title={t("Next Image (Right Arrow / Click)", "अगली फ़ोटो (दायाँ तीर / क्लिक)")}
                     >
                         <ChevronRight className="h-8 w-8 sm:h-10 sm:w-10" />
                     </button>

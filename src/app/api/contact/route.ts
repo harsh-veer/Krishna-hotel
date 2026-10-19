@@ -5,6 +5,7 @@ import { consumeVerifiedEmail, EMAIL_REGEX, normalizeEmail } from '@/lib/otp';
 import { EMAIL_ERROR, isValidIndianMobile, normalizeIndianMobile, PHONE_ERROR } from '@/lib/validation';
 import { sendBookingRequestEmail } from '@/lib/mailer';
 import { GUEST_LIMIT_BY_ROOM } from '@/lib/rooms';
+import { getAvailability } from '@/lib/availability';
 
 async function sendTelegramAlert(booking: {
   name: string;
@@ -118,7 +119,20 @@ export async function POST(req: Request) {
       );
     }
 
+    if (checkOut <= checkIn) {
+      return NextResponse.json({ error: 'Check-out must be after check-in.' }, { status: 400 });
+    }
+
     await dbConnect();
+
+    // Refuse the booking when every room of this type is already taken for these dates.
+    const availability = await getAvailability(finalRoomType, checkIn, checkOut);
+    if (availability && !availability.available) {
+      return NextResponse.json(
+        { error: `Sorry, the ${finalRoomType} is sold out for these dates. Please pick other dates or another room.`, soldOut: true },
+        { status: 409 }
+      );
+    }
 
     // Every booking needs an email address that passed OTP verification.
     if (!(await consumeVerifiedEmail(email))) {

@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import Navbar from "@/components/Navbar";
+import OfferBanner from "@/components/OfferBanner";
 import Footer from "@/components/Footer";
 import FloatingContact from "@/components/FloatingContact";
 import MobileBookingBar from "@/components/MobileBookingBar";
 import AIChatbot from "@/components/AIChatbot";
 import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/next";
+import { LanguageProvider } from "@/lib/i18n";
 import "./globals.css";
 import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT, HOTEL_NAME, PHONE, SITE_URL } from "@/lib/hotel";
 
@@ -107,15 +109,18 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${poppins.variable} font-sans antialiased bg-white text-gray-900 flex flex-col min-h-screen`}
       >
-        <Navbar />
-        <main className="flex-grow">
-          {children}
-        </main>
-        <Footer />
-        <FloatingContact />
-        <MobileBookingBar />
-        <AIChatbot />
-        <Toaster position="bottom-right" />
+        <LanguageProvider>
+          <OfferBanner />
+          <Navbar />
+          <main className="flex-grow">
+            {children}
+          </main>
+          <Footer />
+          <FloatingContact />
+          <MobileBookingBar />
+          <AIChatbot />
+          <Toaster position="bottom-right" />
+        </LanguageProvider>
         <Analytics />
       </body>
     </html>

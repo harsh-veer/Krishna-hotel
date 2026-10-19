@@ -1,12 +1,16 @@
+"use client";
+
+import { useLang } from "@/lib/i18n";
 import { Coffee, Utensils, Clock, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 
 export default function Dining() {
+    const { t } = useLang();
     const highlights = [
-        "Fresh, locally-sourced ingredients",
-        "Pure vegetarian options available",
-        "Customizable spice levels",
-        "Special kids menu",
+        t("Fresh, locally-sourced ingredients", "ताज़ी, स्थानीय सामग्री"),
+        t("Pure vegetarian options available", "शुद्ध शाकाहारी खाना उपलब्ध"),
+        t("Customizable spice levels", "अपनी पसंद के अनुसार मिर्च-मसाला"),
+        t("Special kids menu", "बच्चों के लिए ख़ास मेन्यू"),
     ];
 
     return (
@@ -21,13 +25,16 @@ export default function Dining() {
                     {/* Content Section */}
                     <div className="order-2 lg:order-1">
                         <span className="mb-4 inline-block rounded-full bg-gold/10 px-3 py-1 text-sm font-semibold tracking-wider text-yellow-800 uppercase">
-                            Dining & Room Service
+                            {t("Dining & Room Service", "खाना और रूम सर्विस")}
                         </span>
                         <h2 className="text-3xl font-bold font-heading text-gray-900 sm:text-4xl mb-6">
-                            Delicious Meals, Served Fresh
+                            {t("Delicious Meals, Served Fresh", "स्वादिष्ट खाना, ताज़ा परोसा")}
                         </h2>
                         <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                            Whether you're starting your day with a hearty breakfast or craving a late-night snack, our kitchen is ready to serve you. Enjoy a variety of North Indian staples, light refreshments, and hot beverages prepared with care and hygiene.
+                            {t(
+                                "Whether you're starting your day with a hearty breakfast or craving a late-night snack, our kitchen is ready to serve you. Enjoy a variety of North Indian staples, light refreshments, and hot beverages prepared with care and hygiene.",
+                                "दिन की शुरुआत भरपेट नाश्ते से करनी हो या देर रात कुछ हल्का खाना हो, हमारी रसोई हमेशा तैयार है। साफ़-सफ़ाई और ध्यान से बने उत्तर भारतीय व्यंजन, हल्का नाश्ता और गरम चाय-कॉफ़ी का आनंद लें।"
+                            )}
                         </p>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
@@ -36,8 +43,8 @@ export default function Dining() {
                                     <Clock className="h-6 w-6" />
                                 </div>
                                 <div>
-                                    <h4 className="text-lg font-bold text-gray-900">24/7 Room Service</h4>
-                                    <p className="text-sm text-gray-600 mt-1">Enjoy hot meals delivered straight to your room anytime.</p>
+                                    <h4 className="text-lg font-bold text-gray-900">{t("24/7 Room Service", "24/7 रूम सर्विस")}</h4>
+                                    <p className="text-sm text-gray-600 mt-1">{t("Enjoy hot meals delivered straight to your room anytime.", "कभी भी गरम खाना सीधे अपने कमरे में मँगवाएँ।")}</p>
                                 </div>
                             </div>
 
@@ -46,8 +53,8 @@ export default function Dining() {
                                     <Coffee className="h-6 w-6" />
                                 </div>
                                 <div>
-                                    <h4 className="text-lg font-bold text-gray-900">Complimentary Breakfast</h4>
-                                    <p className="text-sm text-gray-600 mt-1">Start your day right with our freshly prepared morning spread.</p>
+                                    <h4 className="text-lg font-bold text-gray-900">{t("Complimentary Breakfast", "मुफ़्त नाश्ता")}</h4>
+                                    <p className="text-sm text-gray-600 mt-1">{t("Start your day right with our freshly prepared morning spread.", "ताज़ा बने सुबह के नाश्ते के साथ दिन की अच्छी शुरुआत करें।")}</p>
                                 </div>
                             </div>
                         </div>
@@ -55,7 +62,7 @@ export default function Dining() {
                         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
                             <h4 className="text-md font-bold text-gray-900 mb-4 flex items-center">
                                 <Utensils className="h-5 w-5 mr-2 text-gold" />
-                                Highlights
+                                {t("Highlights", "ख़ास बातें")}
                             </h4>
                             <ul className="space-y-3">
                                 {highlights.map((item, idx) => (
@@ -76,13 +83,13 @@ export default function Dining() {
                                 fill
                                 sizes="(min-width: 1024px) 50vw, 100vw"
                                 src="/images/indian-food-dining.jpg"
-                                alt="Fresh North Indian Thali & Breakfast Spread"
+                                alt={t("Fresh North Indian Thali & Breakfast Spread", "ताज़ी उत्तर भारतीय थाली और नाश्ता")}
                                 className="w-full h-full object-cover"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
 
                             <div className="absolute bottom-6 left-6 right-6">
-                                <p className="text-white text-lg font-medium">Authentic flavors crafted for your journey.</p>
+                                <p className="text-white text-lg font-medium">{t("Authentic flavors crafted for your journey.", "आपके सफ़र के लिए असली देसी स्वाद।")}</p>
                             </div>
                         </div>
 
@@ -92,8 +99,8 @@ export default function Dining() {
                                 <span className="text-2xl">🌱</span>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500 font-medium">Dietary Options</p>
-                                <p className="text-md font-bold text-gray-900">100% Veg Available</p>
+                                <p className="text-sm text-gray-500 font-medium">{t("Dietary Options", "खाने के विकल्प")}</p>
+                                <p className="text-md font-bold text-gray-900">{t("100% Veg Available", "100% शाकाहारी")}</p>
                             </div>
                         </div>
                     </div>

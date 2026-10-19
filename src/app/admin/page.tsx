@@ -25,7 +25,8 @@ import {
   Star,
   ThumbsUp,
   Reply,
-  Send
+  Send,
+  Settings as SettingsIcon,
 } from "lucide-react";
 
 interface Booking {
@@ -68,7 +69,7 @@ export default function AdminDashboard() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   // View States
-  const [activeTab, setActiveTab] = useState<"bookings" | "reviews">("bookings");
+  const [activeTab, setActiveTab] = useState<"bookings" | "reviews" | "settings">("bookings");
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
@@ -80,23 +81,92 @@ export default function AdminDashboard() {
   const [responseText, setResponseText] = useState("");
   const [submittingResponse, setSubmittingResponse] = useState(false);
 
-  // Auto-login on mount
-  useEffect(() => {
-    const savedPassword = localStorage.getItem("admin_password");
-    if (savedPassword) {
-      setPassword(savedPassword);
-      autoLogin(savedPassword);
+  // Settings tab: offer banner and room counts.
+  const [siteSettings, setSiteSettings] = useState<{
+    offer: { enabled: boolean; text: string; textHi: string; link: string };
+    inventory: Record<string, number>;
+  } | null>(null);
+  const [savingSettings, setSavingSettings] = useState(false);
+
+  const fetchSettings = async () => {
+    try {
+      const res = await adminFetch("/api/admin/settings");
+      if (res.ok) setSiteSettings(await res.json());
+    } catch {}
+  };
+
+  const saveSiteSettings = async () => {
+    if (!siteSettings) return;
+    setSavingSettings(true);
+    try {
+      const res = await adminFetch("/api/admin/settings", {
+        method: "PUT",
+        body: JSON.stringify(siteSettings),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(data.error || "Could not save settings.");
+        return;
+      }
+      setSiteSettings(data.settings);
+      toast.success("Settings saved. The website updates within a minute.");
+    } catch {
+      toast.error("Could not save settings.");
+    } finally {
+      setSavingSettings(false);
     }
+  };
+
+  // Load data if this browser already has a valid admin session (an httpOnly cookie set at login).
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await adminFetch("/api/admin/session");
+        const data = await res.json();
+        if (data.loggedIn) await loadDashboard();
+      } catch {}
+    })();
+    try { localStorage.removeItem("admin_password"); } catch {} // left over from the old login
   }, []);
 
-  const fetchReviews = async (pwd: string) => {
+  // Log out after 30 minutes without any activity on the page.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let timer: ReturnType<typeof setTimeout>;
+    const reset = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        handleLogout();
+        setError("Logged out after 30 minutes of inactivity.");
+      }, 30 * 60 * 1000);
+    };
+    const events = ["mousemove", "keydown", "click", "touchstart", "scroll"];
+    events.forEach((ev) => window.addEventListener(ev, reset, { passive: true }));
+    reset();
+    return () => {
+      clearTimeout(timer);
+      events.forEach((ev) => window.removeEventListener(ev, reset));
+    };
+  }, [isAuthenticated]);
+
+  // Any 401 from an admin API means the session ended: go back to the login screen.
+  const adminFetch = async (url: string, init: RequestInit = {}) => {
+    const res = await fetch(url, {
+      ...init,
+      headers: { "Content-Type": "application/json", ...(init.headers || {}) },
+    });
+    if (res.status === 401) {
+      setIsAuthenticated(false);
+      setBookings([]);
+      setError("Your session has expired. Please log in again.");
+    }
+    return res;
+  };
+
+  const fetchReviews = async () => {
     setReviewsLoading(true);
     try {
-      const res = await fetch("/api/admin/reviews", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: pwd }),
-      });
+      const res = await adminFetch("/api/admin/reviews", { method: "POST" });
       if (res.ok) {
         const data = await res.json();
         setReviews(data.reviews || []);
@@ -107,28 +177,22 @@ export default function AdminDashboard() {
     }
   };
 
-  const autoLogin = async (savedPassword: string) => {
+  const loadDashboard = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/admin/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: savedPassword }),
-      });
-
+      const response = await adminFetch("/api/admin/bookings", { method: "POST" });
       if (!response.ok) {
-        if (response.status === 401) {
-          localStorage.removeItem("admin_password");
-        }
-        throw new Error(response.status === 401 ? "Session expired" : "Database connection issue");
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Server connection error. Please verify database setup.");
       }
-
       const data = await response.json();
       setBookings(data.bookings || []);
       setIsAuthenticated(true);
-      fetchReviews(savedPassword);
+      setError(null);
+      fetchReviews();
+      fetchSettings();
     } catch (err: any) {
-      setError(err.message || "Failed to login automatically");
+      setError(err.message || "Failed to load bookings");
     } finally {
       setIsLoading(false);
     }
@@ -140,38 +204,28 @@ export default function AdminDashboard() {
     setError(null);
 
     try {
-      const response = await fetch("/api/admin/bookings", {
+      const response = await adminFetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
       });
-
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("Invalid password");
-        } else {
-          const data = await response.json().catch(() => ({}));
-          throw new Error(data.error || "Server connection error. Please verify database setup.");
-        }
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Invalid password");
       }
-
-      const data = await response.json();
-      setBookings(data.bookings || []);
-      localStorage.setItem("admin_password", password);
-      setIsAuthenticated(true);
-      fetchReviews(password);
+      setPassword("");
+      await loadDashboard();
     } catch (err: any) {
       setError(err.message || "Failed to login");
-    } finally {
       setIsLoading(false);
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("admin_password");
+    fetch("/api/admin/login", { method: "DELETE" }).catch(() => {});
     setPassword("");
     setIsAuthenticated(false);
     setBookings([]);
+    setReviews([]);
   };
 
   const handleDelete = async (id: string, guestName: string) => {
@@ -179,10 +233,9 @@ export default function AdminDashboard() {
 
     setDeletingId(id);
     try {
-      const response = await fetch(`/api/admin/bookings/${id}`, {
+      const response = await adminFetch(`/api/admin/bookings/${id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
       });
 
       if (!response.ok) {
@@ -205,10 +258,10 @@ export default function AdminDashboard() {
   const handleStatusChange = async (id: string, newStatus: string) => {
     setUpdatingId(id);
     try {
-      const response = await fetch(`/api/admin/bookings/${id}`, {
+      const response = await adminFetch(`/api/admin/bookings/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password, status: newStatus }),
+        body: JSON.stringify({ status: newStatus }),
       });
 
       if (!response.ok) {
@@ -238,10 +291,10 @@ export default function AdminDashboard() {
 
   const handleApproveReview = async (id: string, currentStatus: boolean) => {
     try {
-      const res = await fetch(`/api/admin/reviews/${id}`, {
+      const res = await adminFetch(`/api/admin/reviews/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, isApproved: !currentStatus }),
+        body: JSON.stringify({ isApproved: !currentStatus }),
       });
       if (res.ok) {
         setReviews(prev => prev.map(r => r._id === id ? { ...r, isApproved: !currentStatus } : r));
@@ -256,10 +309,9 @@ export default function AdminDashboard() {
   const handleDeleteReview = async (id: string) => {
     if (!confirm("Are you sure you want to permanently delete this review?")) return;
     try {
-      const res = await fetch(`/api/admin/reviews/${id}`, {
+      const res = await adminFetch(`/api/admin/reviews/${id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
       });
       if (res.ok) {
         setReviews(prev => prev.filter(r => r._id !== id));
@@ -275,10 +327,10 @@ export default function AdminDashboard() {
     if (!responseText.trim()) return;
     setSubmittingResponse(true);
     try {
-      const res = await fetch(`/api/admin/reviews/${id}`, {
+      const res = await adminFetch(`/api/admin/reviews/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, ownerResponse: responseText }),
+        body: JSON.stringify({ ownerResponse: responseText }),
       });
       if (res.ok) {
         setReviews(prev => prev.map(r => r._id === id ? { ...r, ownerResponse: responseText } : r));
@@ -505,6 +557,17 @@ export default function AdminDashboard() {
                     {pendingReviewsCount}
                   </span>
                 )}
+              </button>
+              <button
+                onClick={() => setActiveTab("settings")}
+                className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${
+                  activeTab === "settings" ? "bg-white text-royal-blue shadow-sm" : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                <span className="flex items-center space-x-1.5">
+                  <SettingsIcon className="h-4 w-4" />
+                  <span>Settings</span>
+                </span>
               </button>
             </div>
             {activeTab === "bookings" && (
@@ -902,6 +965,106 @@ export default function AdminDashboard() {
         )}
 
         </>}
+
+        {/* ===== SETTINGS TAB ===== */}
+        {activeTab === "settings" && (
+          <div className="grid gap-6 lg:grid-cols-2">
+            {!siteSettings ? (
+              <p className="text-gray-500">Loading settings...</p>
+            ) : (
+              <>
+                <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900">Offer banner</h2>
+                    <p className="text-sm text-gray-500">A strip at the top of every page, e.g. a festival discount.</p>
+                  </div>
+                  <label className="flex items-center gap-3 text-sm font-semibold text-gray-800">
+                    <input
+                      type="checkbox"
+                      checked={siteSettings.offer.enabled}
+                      onChange={(e) => setSiteSettings({ ...siteSettings, offer: { ...siteSettings.offer, enabled: e.target.checked } })}
+                      className="h-4 w-4"
+                    />
+                    Show the banner on the website
+                  </label>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">Offer text (English)</label>
+                    <input
+                      value={siteSettings.offer.text}
+                      maxLength={160}
+                      onChange={(e) => setSiteSettings({ ...siteSettings, offer: { ...siteSettings.offer, text: e.target.value } })}
+                      placeholder="Diwali offer: 10% off on all rooms. Book now!"
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">Offer text (Hindi, optional)</label>
+                    <input
+                      value={siteSettings.offer.textHi}
+                      maxLength={160}
+                      onChange={(e) => setSiteSettings({ ...siteSettings, offer: { ...siteSettings.offer, textHi: e.target.value } })}
+                      placeholder="दिवाली ऑफर: सभी कमरों पर 10% छूट। अभी बुक करें!"
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">Link when tapped (optional)</label>
+                    <input
+                      value={siteSettings.offer.link}
+                      onChange={(e) => setSiteSettings({ ...siteSettings, offer: { ...siteSettings.offer, link: e.target.value } })}
+                      placeholder="/#contact"
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">Use /#contact for the booking form, or a full https:// link.</p>
+                  </div>
+                  {siteSettings.offer.text && (
+                    <div className="rounded-lg bg-gold text-royal-blue text-center text-sm font-semibold px-4 py-2">
+                      {siteSettings.offer.text}
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900">Rooms available for booking</h2>
+                    <p className="text-sm text-gray-500">
+                      How many rooms of each type guests can book online. When all are taken for a date
+                      (Pending, Confirmed or Checked-in), the website shows Sold Out. Set 0 to stop online bookings for a type.
+                    </p>
+                  </div>
+                  {Object.entries(siteSettings.inventory).map(([room, count]) => (
+                    <div key={room} className="flex items-center justify-between gap-4">
+                      <span className="text-sm font-semibold text-gray-800">{room}</span>
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        value={count}
+                        onChange={(e) =>
+                          setSiteSettings({
+                            ...siteSettings,
+                            inventory: { ...siteSettings.inventory, [room]: Math.max(0, parseInt(e.target.value || "0", 10)) },
+                          })
+                        }
+                        className="w-24 rounded-lg border border-gray-300 px-3 py-2 text-sm text-right"
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="lg:col-span-2">
+                  <button
+                    onClick={saveSiteSettings}
+                    disabled={savingSettings}
+                    className="bg-royal-blue text-white font-semibold px-6 py-3 rounded-lg disabled:opacity-60"
+                  >
+                    {savingSettings ? "Saving..." : "Save settings"}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
 
         {/* ===== REVIEWS TAB ===== */}
         {activeTab === "reviews" && (

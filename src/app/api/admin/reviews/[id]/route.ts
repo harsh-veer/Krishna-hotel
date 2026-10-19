@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/adminAuth';
 import dbConnect from '@/lib/mongodb';
 import { Review } from '@/models/Review';
 
@@ -8,16 +9,9 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    const { password, isApproved, ownerResponse } = await req.json();
-
-    const adminPassword = process.env.ADMIN_PASSWORD;
-
-    if (!adminPassword || password !== adminPassword) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Invalid password.' },
-        { status: 401 }
-      );
-    }
+    const { isApproved, ownerResponse } = await req.json();
+    const denied = await requireAdmin();
+    if (denied) return denied;
 
     await dbConnect();
 
@@ -54,16 +48,8 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const { password } = await req.json();
-
-    const adminPassword = process.env.ADMIN_PASSWORD;
-
-    if (!adminPassword || password !== adminPassword) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Invalid password.' },
-        { status: 401 }
-      );
-    }
+    const denied = await requireAdmin();
+    if (denied) return denied;
 
     await dbConnect();
 

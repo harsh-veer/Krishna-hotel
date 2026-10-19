@@ -6,7 +6,10 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import EmailOtpField from "@/components/EmailOtpField";
 import { bookingWhatsAppLink } from "@/lib/hotel";
-import { isValidIndianMobile, normalizeIndianMobile, PHONE_ERROR, sanitizePhoneInput } from "@/lib/validation";
+import { isValidIndianMobile, normalizeIndianMobile, sanitizePhoneInput } from "@/lib/validation";
+import { useLang, type Text } from "@/lib/i18n";
+import { MSG } from "@/lib/i18n/messages";
+import { ROOM_NAME_HI } from "@/lib/i18n/rooms";
 
 interface Message {
   id: string;
@@ -16,17 +19,26 @@ interface Message {
   isBookingWidget?: boolean;
 }
 
-const QUICK_PROMPTS = [
-  "📅 Book A Room Now",
-  "🌟 Why choose Krishna Hotel?",
-  "🏨 What facilities do you offer?",
-  "📍 How far is Ayodhya & Ram Mandir?",
-  "🛏️ What room types & rates are available?",
-  "🍽️ Is pure veg food available?",
-  "🎉 Banquet Hall & Event booking info",
+// The chip text is what gets sent, in the chosen language; `booking` opens the booking form.
+const QUICK_PROMPTS: (Text & { booking?: boolean })[] = [
+  { en: "📅 Book A Room Now", hi: "📅 अभी कमरा बुक करें", booking: true },
+  { en: "🌟 Why choose Krishna Hotel?", hi: "🌟 कृष्णा होटल ही क्यों चुनें?" },
+  { en: "🏨 What facilities do you offer?", hi: "🏨 होटल में कौन-कौन सी सुविधाएँ हैं?" },
+  { en: "📍 How far is Ayodhya & Ram Mandir?", hi: "📍 अयोध्या और राम मंदिर कितनी दूर है?" },
+  { en: "🛏️ What room types & rates are available?", hi: "🛏️ कौन-कौन से कमरे हैं और किराया कितना है?" },
+  { en: "🍽️ Is pure veg food available?", hi: "🍽️ क्या शुद्ध शाकाहारी खाना मिलता है?" },
+  { en: "🎉 Banquet Hall & Event booking info", hi: "🎉 बैंक्वेट हॉल और इवेंट बुकिंग की जानकारी" },
 ];
 
+// Shown for the "welcome-1" message in whichever language is selected.
+const WELCOME: Text = {
+  en: "Namaste! Jai Shree Ram! 🙏 Welcome to **Krishna Hotel & Restaurant**.\n\nI am your AI Concierge! Ask me anything about our **rooms (₹999 - ₹1,500)**, **facilities**, **pure veg restaurant**, or click below to **book a room instantly**.\n\nHow may I assist you today?",
+  hi: "नमस्ते! जय श्री राम! 🙏 **कृष्णा होटल एवं रेस्टोरेंट** में आपका स्वागत है।\n\nमैं आपका AI सहायक हूँ! हमारे **कमरों (₹999 - ₹1,500)**, **सुविधाओं** या **शुद्ध शाकाहारी रेस्टोरेंट** के बारे में कुछ भी पूछें, या नीचे क्लिक करके **तुरंत कमरा बुक करें**।\n\nबताइए, मैं आपकी क्या मदद कर सकता हूँ?",
+};
+
 export default function AIChatbot() {
+  const { lang, t } = useLang();
+  const roomLabel = (name: string) => (lang === "hi" ? ROOM_NAME_HI[name] ?? name : name);
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -87,14 +99,15 @@ export default function AIChatbot() {
       },
     ]);
     setBookingConfirmed(false);
-    toast.success("Chat cleared!");
+    toast.success(t("Chat cleared!", "चैट साफ़ हो गई!"));
   };
 
-  const handleSend = async (textToSend?: string) => {
+  const handleSend = async (textToSend?: string, forceBooking = false) => {
     const query = (textToSend || input).trim();
     if (!query || isLoading) return;
 
     const isBookingRequest =
+      forceBooking ||
       query.includes("Book A Room") ||
       query.toLowerCase().includes("book now") ||
       query.toLowerCase().includes("reserve") ||
@@ -116,7 +129,10 @@ export default function AIChatbot() {
         const botMsg: Message = {
           id: (Date.now() + 1).toString(),
           sender: "bot",
-          text: "I can help you reserve a room right here, or direct you to our full reservation form! Fill out the quick details below:",
+          text: t(
+            "I can help you reserve a room right here, or direct you to our full reservation form! Fill out the quick details below:",
+            "मैं यहीं आपका कमरा बुक करने में मदद कर सकता हूँ, या आपको पूरे बुकिंग फ़ॉर्म पर ले जा सकता हूँ! नीचे ज़रूरी जानकारी भरें:"
+          ),
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           isBookingWidget: true,
         };
@@ -137,7 +153,7 @@ export default function AIChatbot() {
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),
         sender: "bot",
-        text: data.reply || "I am currently unable to fetch that. Please call us at +91 86046 80149!",
+        text: data.reply || t("I am currently unable to fetch that. Please call us at +91 86046 80149!", "अभी मैं यह जानकारी नहीं ला पा रहा हूँ। कृपया +91 86046 80149 पर कॉल करें!"),
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
 
@@ -149,7 +165,10 @@ export default function AIChatbot() {
         {
           id: (Date.now() + 1).toString(),
           sender: "bot",
-          text: "Apologies! I encountered a connection issue. You can reach us directly on WhatsApp or call [**+91 86046 80149**](tel:+918604680149).",
+          text: t(
+            "Apologies! I encountered a connection issue. You can reach us directly on WhatsApp or call [**+91 86046 80149**](tel:+918604680149).",
+            "माफ़ कीजिए! कनेक्शन में दिक्कत आ गई। आप सीधे व्हाट्सऐप पर संपर्क करें या [**+91 86046 80149**](tel:+918604680149) पर कॉल करें।"
+          ),
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         },
       ]);
@@ -163,18 +182,18 @@ export default function AIChatbot() {
 
     const nameTrimmed = bookingForm.name.trim();
     if (!nameTrimmed || nameTrimmed.length < 2 || !/^[a-zA-Z\s]+$/.test(nameTrimmed)) {
-      toast.error("Please enter a valid name (letters only, min 2 characters).");
+      toast.error(t("Please enter a valid name (letters only, min 2 characters).", "कृपया सही नाम डालें (सिर्फ़ अंग्रेज़ी अक्षर, कम से कम 2)।"));
       return;
     }
 
     if (!isValidIndianMobile(bookingForm.phone)) {
-      toast.error(PHONE_ERROR);
+      toast.error(t(MSG.phoneError));
       return;
     }
     const phoneTrimmed = normalizeIndianMobile(bookingForm.phone);
 
     if (!bookingEmailVerified) {
-      toast.error("Please verify your email with the 6-digit code first.");
+      toast.error(t(MSG.verifyEmailFirst));
       return;
     }
 
@@ -202,28 +221,32 @@ export default function AIChatbot() {
       const resData = await res.json();
       if (!res.ok) {
         if (resData.needsVerification) setBookingEmailVerified(false);
-        throw new Error(resData.error || "Booking submission failed.");
+        throw new Error(resData.error || t("Booking submission failed.", "बुकिंग अनुरोध नहीं भेजा जा सका।"));
       }
 
       setBookingConfirmed(true);
-      toast.success("Booking Request Confirmed! Our team will call you shortly.");
+      toast.success(t("Booking Request Confirmed! Our team will call you shortly.", "बुकिंग अनुरोध मिल गया! हमारी टीम जल्द ही आपको कॉल करेगी।"));
 
       // Also trigger event to populate site form
       window.dispatchEvent(
         new CustomEvent("roomSelected", { detail: bookingForm.roomType })
       );
 
+      const whatsAppLink = bookingWhatsAppLink({ name: nameTrimmed, roomType: bookingForm.roomType, checkIn: checkInDate, checkOut: checkOutDate, guests: bookingForm.guests });
       const confirmMsg: Message = {
         id: (Date.now() + 2).toString(),
         sender: "bot",
-        text: `🎉 **Booking Request Received!**\n\n• **Guest**: ${nameTrimmed}\n• **Phone**: ${phoneTrimmed}\n• **Room**: ${bookingForm.roomType}\n• **Check-in**: ${checkInDate}\n• **Check-out**: ${checkOutDate}\n\nOur front desk will call you at **${phoneTrimmed}** shortly to confirm your room.\n\n📲 [Confirm Instantly via WhatsApp](${bookingWhatsAppLink({ name: nameTrimmed, roomType: bookingForm.roomType, checkIn: checkInDate, checkOut: checkOutDate, guests: bookingForm.guests })})`,
+        text: t(
+          `🎉 **Booking Request Received!**\n\n• **Guest**: ${nameTrimmed}\n• **Phone**: ${phoneTrimmed}\n• **Room**: ${bookingForm.roomType}\n• **Check-in**: ${checkInDate}\n• **Check-out**: ${checkOutDate}\n\nOur front desk will call you at **${phoneTrimmed}** shortly to confirm your room.\n\n📲 [Confirm Instantly via WhatsApp](${whatsAppLink})`,
+          `🎉 **बुकिंग अनुरोध मिल गया!**\n\n• **मेहमान**: ${nameTrimmed}\n• **फ़ोन**: ${phoneTrimmed}\n• **कमरा**: ${roomLabel(bookingForm.roomType)}\n• **चेक-इन**: ${checkInDate}\n• **चेक-आउट**: ${checkOutDate}\n\nकमरा पक्का करने के लिए हमारा रिसेप्शन जल्द ही आपको **${phoneTrimmed}** पर कॉल करेगा।\n\n📲 [व्हाट्सऐप पर तुरंत पक्का करें](${whatsAppLink})`
+        ),
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
 
       setMessages((prev) => [...prev, confirmMsg]);
     } catch (err: any) {
       console.error("Chatbot booking submission error:", err);
-      toast.error(err.message || "Failed to submit booking. Please call +91 86046 80149!");
+      toast.error(err.message || t("Failed to submit booking. Please call +91 86046 80149!", "बुकिंग नहीं भेजी जा सकी। कृपया +91 86046 80149 पर कॉल करें!"));
     } finally {
       setIsSubmittingBooking(false);
     }
@@ -335,7 +358,7 @@ export default function AIChatbot() {
         <button
           onClick={() => setIsOpen(true)}
           className="fixed bottom-24 md:bottom-6 left-6 z-40 flex items-center gap-2.5 rounded-full bg-gradient-to-r from-red-600 via-royal-blue to-gold p-3 text-white shadow-2xl hover:scale-105 transition-all duration-300 group border-2 border-white/30"
-          aria-label="Open AI Assistant"
+          aria-label={t("Open AI Assistant", "AI सहायक खोलें")}
         >
           <div className="relative flex items-center justify-center">
             <Sparkles className="h-6 w-6 animate-pulse text-gold" />
@@ -345,7 +368,7 @@ export default function AIChatbot() {
             </span>
           </div>
           <span className="hidden sm:inline font-semibold text-sm pr-1">
-            Ask Krishna AI
+            {t("Ask Krishna AI", "कृष्णा AI से पूछें")}
           </span>
         </button>
       )}
@@ -360,7 +383,7 @@ export default function AIChatbot() {
               <div className="relative h-10 w-10 rounded-full bg-white/10 p-1 flex items-center justify-center border border-white/20 shrink-0">
                 <Image
                   src="/logo-transparent.png"
-                  alt="Krishna Hotel Logo"
+                  alt={t("Krishna Hotel Logo", "कृष्णा होटल लोगो")}
                   width={32}
                   height={32}
                   className="h-8 w-auto object-contain"
@@ -369,9 +392,9 @@ export default function AIChatbot() {
               </div>
               <div>
                 <h3 className="font-bold text-base flex items-center gap-1.5 font-heading tracking-wide">
-                  Krishna AI Assistant <Sparkles className="h-4 w-4 text-gold" />
+                  {t("Krishna AI Assistant", "कृष्णा AI सहायक")} <Sparkles className="h-4 w-4 text-gold" />
                 </h3>
-                <p className="text-xs text-gray-300">Online • Hotel Facilities & Booking Concierge</p>
+                <p className="text-xs text-gray-300">{t("Online • Hotel Facilities & Booking Concierge", "ऑनलाइन • होटल सुविधाएँ और बुकिंग सहायक")}</p>
               </div>
             </div>
 
@@ -381,28 +404,28 @@ export default function AIChatbot() {
                   triggerScrollToContact();
                 }}
                 className="hidden sm:inline-flex items-center gap-1 bg-gold text-gray-900 font-bold text-xs px-2.5 py-1 rounded-lg hover:bg-gold-light transition-colors"
-                title="Go to Full Reservation Form"
+                title={t("Go to Full Reservation Form", "पूरे बुकिंग फ़ॉर्म पर जाएँ")}
               >
-                <Calendar className="h-3.5 w-3.5" /> Book
+                <Calendar className="h-3.5 w-3.5" /> {t("Book", "बुक करें")}
               </button>
               <button
                 onClick={handleClearChat}
                 className="p-1.5 rounded-lg hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
-                title="Clear Chat History"
+                title={t("Clear Chat History", "चैट साफ़ करें")}
               >
                 <RotateCcw className="h-4.5 w-4.5" />
               </button>
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-1.5 rounded-lg hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
-                title="Minimize Chat"
+                title={t("Minimize Chat", "चैट छोटा करें")}
               >
                 <ChevronDown className="h-5 w-5" />
               </button>
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-1.5 rounded-lg hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
-                title="Close Chat"
+                title={t("Close Chat", "चैट बंद करें")}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -412,7 +435,7 @@ export default function AIChatbot() {
           {/* Quick Info Bar */}
           <div className="bg-amber-50 px-3.5 py-2 border-b border-amber-200 text-xs text-amber-900 flex items-center justify-between shadow-xs">
             <span className="flex items-center gap-1.5 font-medium truncate">
-              <MapPin className="h-3.5 w-3.5 text-red-600 shrink-0" /> Ayodhya Highway, Ambedkar Nagar
+              <MapPin className="h-3.5 w-3.5 text-red-600 shrink-0" /> {t("Ayodhya Highway, Ambedkar Nagar", "अयोध्या हाईवे, अम्बेडकर नगर")}
             </span>
             <button
               onClick={() => {
@@ -420,7 +443,7 @@ export default function AIChatbot() {
               }}
               className="font-bold text-royal-blue hover:underline flex items-center gap-1 shrink-0 ml-2 bg-white px-2 py-0.5 rounded border border-royal-blue/20"
             >
-              <Calendar className="h-3 w-3" /> Form
+              <Calendar className="h-3 w-3" /> {t("Form", "फ़ॉर्म")}
             </button>
           </div>
 
@@ -438,10 +461,10 @@ export default function AIChatbot() {
                     }`}
                 >
                   <div className="text-[11px] font-semibold mb-2 opacity-70 flex items-center justify-between gap-4 border-b border-gray-100 pb-1">
-                    <span>{msg.sender === "user" ? "You" : "Krishna Hotel Concierge"}</span>
+                    <span>{msg.sender === "user" ? t("You", "आप") : t("Krishna Hotel Concierge", "कृष्णा होटल सहायक")}</span>
                     <span className="text-[10px] font-normal">{msg.timestamp}</span>
                   </div>
-                  <div>{renderFormattedText(msg.text, msg.sender === "user")}</div>
+                  <div>{renderFormattedText(msg.id === "welcome-1" ? t(WELCOME) : msg.text, msg.sender === "user")}</div>
 
                   {/* Interactive Booking Widget embedded in chat */}
                   {msg.isBookingWidget && !bookingConfirmed && (
@@ -451,13 +474,13 @@ export default function AIChatbot() {
                     >
                       <div className="flex items-center justify-between border-b border-gray-200 pb-2">
                         <span className="font-bold text-royal-blue flex items-center gap-1">
-                          <BedDouble className="h-4 w-4" /> Instant Room Booking
+                          <BedDouble className="h-4 w-4" /> {t("Instant Room Booking", "तुरंत कमरा बुकिंग")}
                         </span>
                         <span className="text-[10px] text-gray-500">₹999 - ₹1,500</span>
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-semibold text-gray-700 mb-1">Your Full Name (Letters only)</label>
+                        <label className="block text-[11px] font-semibold text-gray-700 mb-1">{t("Your Full Name (Letters only)", "आपका पूरा नाम (अंग्रेज़ी अक्षरों में)")}</label>
                         <input
                           type="text"
                           required
@@ -466,13 +489,13 @@ export default function AIChatbot() {
                             const lettersOnly = e.target.value.replace(/[^a-zA-Z\s]/g, "");
                             setBookingForm({ ...bookingForm, name: lettersOnly });
                           }}
-                          placeholder="e.g. Krishna Hotel"
+                          placeholder={t("e.g. Krishna Hotel", "जैसे Ramesh Kumar")}
                           className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-royal-blue focus:outline-none bg-white"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-semibold text-gray-700 mb-1">Mobile Number (10 digits, India)</label>
+                        <label className="block text-[11px] font-semibold text-gray-700 mb-1">{t("Mobile Number (10 digits, India)", "मोबाइल नंबर (10 अंक, भारत)")}</label>
                         <input
                           type="tel"
                           required
@@ -480,14 +503,14 @@ export default function AIChatbot() {
                           inputMode="tel"
                           maxLength={13}
                           onChange={(e) => setBookingForm({ ...bookingForm, phone: sanitizePhoneInput(e.target.value) })}
-                          placeholder="e.g. 9876543210 or +919876543210"
+                          placeholder={t("e.g. 9876543210 or +919876543210", "जैसे 9876543210 या +919876543210")}
                           className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-royal-blue focus:outline-none bg-white"
                         />
                       </div>
 
                       <EmailOtpField
                         id="chat-email"
-                        label="Email (we'll send a 6-digit code)"
+                        label={t("Email (we'll send a 6-digit code)", "ईमेल (हम 6 अंकों का कोड भेजेंगे)")}
                         email={bookingForm.email}
                         onEmailChange={(email) => setBookingForm((prev) => ({ ...prev, email }))}
                         verified={bookingEmailVerified}
@@ -499,7 +522,7 @@ export default function AIChatbot() {
 
                       <div className="grid grid-cols-2 gap-2">
                         <div>
-                          <label className="block text-[11px] font-semibold text-gray-700 mb-1">Check-in Date</label>
+                          <label className="block text-[11px] font-semibold text-gray-700 mb-1">{t("Check-in Date", "चेक-इन तारीख़")}</label>
                           <input
                             type="date"
                             min={today}
@@ -516,7 +539,7 @@ export default function AIChatbot() {
                           />
                         </div>
                         <div>
-                          <label className="block text-[11px] font-semibold text-gray-700 mb-1">Check-out Date</label>
+                          <label className="block text-[11px] font-semibold text-gray-700 mb-1">{t("Check-out Date", "चेक-आउट तारीख़")}</label>
                           <input
                             type="date"
                             min={minCheckOut}
@@ -528,15 +551,15 @@ export default function AIChatbot() {
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-semibold text-gray-700 mb-1">Select Room Type</label>
+                        <label className="block text-[11px] font-semibold text-gray-700 mb-1">{t("Select Room Type", "कमरे का प्रकार चुनें")}</label>
                         <select
                           value={bookingForm.roomType}
                           onChange={(e) => setBookingForm({ ...bookingForm, roomType: e.target.value })}
                           className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-royal-blue focus:outline-none bg-white"
                         >
-                          <option value="Standard Ac Room">Standard Ac Room (₹1,200)</option>
-                          <option value="Super-Deluxe Room">Super-Deluxe Room (₹1,500)</option>
-                          <option value="Non-Ac Deluxe">Non-Ac Deluxe (₹999)</option>
+                          <option value="Standard Ac Room">{roomLabel("Standard Ac Room")} (₹1,200)</option>
+                          <option value="Super-Deluxe Room">{roomLabel("Super-Deluxe Room")} (₹1,500)</option>
+                          <option value="Non-Ac Deluxe">{roomLabel("Non-Ac Deluxe")} (₹999)</option>
                         </select>
                       </div>
 
@@ -546,7 +569,7 @@ export default function AIChatbot() {
                           disabled={isSubmittingBooking || !bookingEmailVerified}
                           className="flex-1 disabled:opacity-60 disabled:cursor-not-allowed bg-royal-blue text-white font-bold py-2 rounded-lg text-xs hover:bg-royal-blue-light transition-colors flex items-center justify-center gap-1 shadow-sm"
                         >
-                          {isSubmittingBooking ? "Booking..." : "Confirm Booking Request"}
+                          {isSubmittingBooking ? t("Booking...", "बुक हो रहा है...") : t("Confirm Booking Request", "बुकिंग अनुरोध भेजें")}
                         </button>
                         <button
                           type="button"
@@ -554,9 +577,9 @@ export default function AIChatbot() {
                             triggerScrollToContact();
                           }}
                           className="bg-white text-gray-700 font-semibold px-2.5 py-2 rounded-lg text-xs border border-gray-300 hover:bg-gray-100"
-                          title="Open Full Website Form"
+                          title={t("Open Full Website Form", "वेबसाइट का पूरा फ़ॉर्म खोलें")}
                         >
-                          Website Form ↗
+                          {t("Website Form ↗", "वेबसाइट फ़ॉर्म ↗")}
                         </button>
                       </div>
                     </form>
@@ -570,7 +593,7 @@ export default function AIChatbot() {
               <div className="flex justify-start">
                 <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-none p-3.5 shadow-sm flex items-center gap-2.5">
                   <Bot className="h-4 w-4 text-royal-blue animate-bounce" />
-                  <span className="text-xs text-gray-600 font-medium">Krishna AI is preparing details...</span>
+                  <span className="text-xs text-gray-600 font-medium">{t("Krishna AI is preparing details...", "कृष्णा AI जानकारी तैयार कर रहा है...")}</span>
                 </div>
               </div>
             )}
@@ -582,14 +605,14 @@ export default function AIChatbot() {
             {QUICK_PROMPTS.map((prompt, idx) => (
               <button
                 key={idx}
-                onClick={() => handleSend(prompt)}
+                onClick={() => handleSend(t(prompt), prompt.booking)}
                 disabled={isLoading}
-                className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-all shrink-0 shadow-2xs ${prompt.includes("Book")
+                className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-all shrink-0 shadow-2xs ${prompt.booking
                     ? "bg-royal-blue text-white border-royal-blue hover:bg-royal-blue-light"
                     : "bg-gray-100 hover:bg-royal-blue hover:text-white text-gray-700 border-gray-200"
                   }`}
               >
-                {prompt}
+                {t(prompt)}
               </button>
             ))}
           </div>
@@ -606,7 +629,7 @@ export default function AIChatbot() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about rooms, facilities, or type 'Book'..."
+              placeholder={t("Ask about rooms, facilities, or type 'Book'...", "कमरों, सुविधाओं के बारे में पूछें या 'Book' लिखें...")}
               disabled={isLoading}
               className="flex-1 rounded-xl border border-gray-300 px-3.5 py-2.5 text-xs sm:text-sm text-gray-900 focus:border-royal-blue focus:outline-none focus:ring-1 focus:ring-royal-blue disabled:bg-gray-50 placeholder:text-gray-400"
             />
@@ -614,9 +637,9 @@ export default function AIChatbot() {
               type="submit"
               disabled={!input.trim() || isLoading}
               className="rounded-xl bg-royal-blue px-3.5 py-2.5 text-white hover:bg-royal-blue-light disabled:opacity-50 transition-colors shrink-0 font-semibold text-xs flex items-center gap-1.5 shadow-sm"
-              title="Send Message"
+              title={t("Send Message", "संदेश भेजें")}
             >
-              <span>Send</span>
+              <span>{t("Send", "भेजें")}</span>
               <Send className="h-3.5 w-3.5" />
             </button>
           </form>

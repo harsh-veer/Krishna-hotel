@@ -1,13 +1,17 @@
+"use client";
+
 import { Phone } from "lucide-react";
+import { useLang } from "@/lib/i18n";
 
 export default function FloatingContact() {
+    const { t } = useLang();
     return (
         <div className="fixed bottom-24 md:bottom-6 right-6 z-50 flex flex-col gap-4">
             {/* Phone Button */}
             <a
                 href="tel:+918604680149"
                 className="flex h-14 w-14 items-center justify-center rounded-full bg-royal-blue text-white shadow-lg shadow-royal-blue/30 hover:bg-royal-blue-light hover:-translate-y-1 transition-all duration-300"
-                aria-label="Call Us"
+                aria-label={t("Call Us", "कॉल करें")}
             >
                 <Phone className="h-6 w-6" />
             </a>
@@ -18,7 +22,7 @@ export default function FloatingContact() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-[#25D366]/30 hover:bg-[#20BE5A] hover:-translate-y-1 transition-all duration-300"
-                aria-label="WhatsApp Us"
+                aria-label={t("WhatsApp Us", "व्हाट्सऐप करें")}
             >
                 {/* WhatsApp SVG Icon */}
                 <svg

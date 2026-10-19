@@ -2,10 +2,12 @@
 
 import { CalendarRange } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useLang } from "@/lib/i18n";
 
 export default function MobileBookingBar() {
     // Room pages carry their own booking form; everywhere else, go to the homepage form.
     const pathname = usePathname();
+    const { t } = useLang();
     const href = pathname?.startsWith("/rooms/") ? "#contact" : "/#contact";
 
     return (
@@ -15,7 +17,7 @@ export default function MobileBookingBar() {
                 className="flex w-full items-center justify-center space-x-2 rounded-lg bg-royal-blue px-4 py-3.5 text-base font-bold text-white shadow-sm hover:bg-royal-blue-light transition-colors"
             >
                 <CalendarRange className="h-5 w-5" />
-                <span>Book Now</span>
+                <span>{t("Book Now", "अभी बुक करें")}</span>
             </a>
         </div>
     );

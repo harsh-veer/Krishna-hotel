@@ -3,31 +3,43 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, MessageCircleQuestion } from "lucide-react";
+import { useLang } from "@/lib/i18n";
 
 const faqs = [
     {
         question: "What are the check-in and check-out times?",
-        answer: "Our standard check-in time is 12:00 PM, and check-out time is 11:00 AM. If you need early check-in or late check-out, please contact us in advance and we will do our best to accommodate you based on availability."
+        answer: "Our standard check-in time is 12:00 PM, and check-out time is 11:00 AM. If you need early check-in or late check-out, please contact us in advance and we will do our best to accommodate you based on availability.",
+        questionHi: "चेक-इन और चेक-आउट का समय क्या है?",
+        answerHi: "हमारा चेक-इन समय दोपहर 12:00 बजे और चेक-आउट समय सुबह 11:00 बजे है। अगर आपको जल्दी चेक-इन या देर से चेक-आउट चाहिए, तो पहले से बता दें, कमरा खाली होने पर हम पूरी कोशिश करेंगे।"
     },
     {
         question: "Is there safe parking available?",
-        answer: "Yes, we offer ample, free, and secure parking on our premises for both cars and larger vehicles. It is safely monitored 24/7."
+        answer: "Yes, we offer ample, free, and secure parking on our premises for both cars and larger vehicles. It is safely monitored 24/7.",
+        questionHi: "क्या सुरक्षित पार्किंग है?",
+        answerHi: "हाँ, होटल परिसर में कार और बड़ी गाड़ियों के लिए बड़ी, मुफ़्त और सुरक्षित पार्किंग है, जिस पर 24/7 निगरानी रहती है।"
     },
     {
         question: "Is the hotel family-friendly?",
-        answer: "Absolutely! We pride ourselves on being a safe and comfortable environment for families. We offer spacious family rooms and are located in a very secure area."
+        answer: "Absolutely! We pride ourselves on being a safe and comfortable environment for families. We offer spacious family rooms and are located in a very secure area.",
+        questionHi: "क्या होटल परिवार के लिए सही है?",
+        answerHi: "बिल्कुल! हमारा होटल परिवारों के लिए सुरक्षित और आरामदायक है। हमारे पास बड़े फ़ैमिली कमरे हैं और होटल बहुत सुरक्षित इलाके में है।"
     },
     {
         question: "Do you offer food and room service?",
-        answer: "Yes, we have a fully functioning restaurant serving delicious meals, and we also offer 24/7 room service so you can enjoy your meals in the comfort of your room."
+        answer: "Yes, we have a fully functioning restaurant serving delicious meals, and we also offer 24/7 room service so you can enjoy your meals in the comfort of your room.",
+        questionHi: "क्या खाना और रूम सर्विस मिलती है?",
+        answerHi: "हाँ, हमारा अपना रेस्टोरेंट है जहाँ स्वादिष्ट खाना मिलता है, और 24/7 रूम सर्विस भी है ताकि आप आराम से अपने कमरे में खाना खा सकें।"
     },
     {
         question: "Is Banquet facility available?",
-        answer: "Yes, we have a banquet facility available for parties and events."
+        answer: "Yes, we have a banquet facility available for parties and events.",
+        questionHi: "क्या बैंक्वेट हॉल की सुविधा है?",
+        answerHi: "हाँ, पार्टी और कार्यक्रमों के लिए हमारे पास बैंक्वेट हॉल है।"
     }
 ];
 
 // Only the open answer is in the HTML, so all answers also go out as FAQPage data for search engines.
+// The structured data stays English, like the server-rendered page.
 const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -40,6 +52,7 @@ const faqJsonLd = {
 
 export default function FAQ() {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
+    const { t } = useLang();
 
     return (
         <section className="py-20 bg-white">
@@ -53,10 +66,10 @@ export default function FAQ() {
                         <MessageCircleQuestion className="h-6 w-6" />
                     </div>
                     <h2 className="text-3xl font-bold font-heading text-gray-900 sm:text-4xl">
-                        Frequently Asked Questions
+                        {t("Frequently Asked Questions", "अक्सर पूछे जाने वाले सवाल")}
                     </h2>
                     <p className="mt-4 text-lg text-gray-600">
-                        Everything you need to know before you stay with us.
+                        {t("Everything you need to know before you stay with us.", "हमारे यहाँ ठहरने से पहले की सारी ज़रूरी जानकारी।")}
                     </p>
                 </div>
 
@@ -71,7 +84,7 @@ export default function FAQ() {
                                 aria-expanded={openIndex === index}
                                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                             >
-                                <span className="text-lg font-semibold text-gray-900">{faq.question}</span>
+                                <span className="text-lg font-semibold text-gray-900">{t(faq.question, faq.questionHi)}</span>
                                 <motion.div
                                     animate={{ rotate: openIndex === index ? 180 : 0 }}
                                     transition={{ duration: 0.2 }}
@@ -89,7 +102,7 @@ export default function FAQ() {
                                         transition={{ duration: 0.3, ease: "easeInOut" }}
                                     >
                                         <div className="px-6 pb-5 text-gray-600 leading-relaxed border-t border-royal-blue/10 pt-4">
-                                            {faq.answer}
+                                            {t(faq.answer, faq.answerHi)}
                                         </div>
                                     </motion.div>
                                 )}

@@ -4,6 +4,7 @@ import { Star, MessageSquare, Loader2, ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT, GOOGLE_REVIEWS_URL } from "@/lib/hotel";
+import { useLang, type Lang } from "@/lib/i18n";
 
 interface Review {
     _id: string;
@@ -14,9 +15,16 @@ interface Review {
     createdAt: string;
 }
 
-const timeAgo = (dateStr: string) => {
+const timeAgo = (dateStr: string, lang: Lang = "en") => {
     const diff = Date.now() - new Date(dateStr).getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    if (lang === "hi") {
+        if (days < 1) return "आज";
+        if (days < 7) return `${days} दिन पहले`;
+        if (days < 30) return `${Math.floor(days / 7)} हफ़्ते पहले`;
+        if (days < 365) return `${Math.floor(days / 30)} महीने पहले`;
+        return `${Math.floor(days / 365)} साल पहले`;
+    }
     if (days < 1) return "Today";
     if (days === 1) return "1 day ago";
     if (days < 7) return `${days} days ago`;
@@ -26,6 +34,7 @@ const timeAgo = (dateStr: string) => {
 };
 
 export default function Reviews() {
+    const { lang, t } = useLang();
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -58,14 +67,23 @@ export default function Reviews() {
                     </div>
                     <p className="text-4xl font-bold text-gray-900 mb-1">{GOOGLE_RATING.toFixed(1)}</p>
                     <p className="text-sm text-gray-500 mb-4">
-                        from {GOOGLE_REVIEW_COUNT}+ reviews on{" "}
-                        <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-royal-blue hover:underline">Google</a>
+                        {lang === "hi" ? (
+                            <>
+                                <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-royal-blue hover:underline">गूगल</a>
+                                {` पर ${GOOGLE_REVIEW_COUNT}+ रिव्यू`}
+                            </>
+                        ) : (
+                            <>
+                                from {GOOGLE_REVIEW_COUNT}+ reviews on{" "}
+                                <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-royal-blue hover:underline">Google</a>
+                            </>
+                        )}
                     </p>
                     <h2 className="text-3xl font-bold font-heading text-gray-900 sm:text-4xl">
-                        Loved by Highway Travelers
+                        {t("Loved by Highway Travelers", "हाईवे यात्रियों की पसंद")}
                     </h2>
                     <p className="mt-4 text-lg text-gray-600">
-                        Read what our recent guests have to say about their stay at Krishna Hotel.
+                        {t("Read what our recent guests have to say about their stay at Krishna Hotel.", "पढ़िए हाल ही में ठहरे मेहमान कृष्णा होटल के बारे में क्या कहते हैं।")}
                     </p>
                 </div>
 
@@ -83,7 +101,7 @@ export default function Reviews() {
                                     </div>
                                     <div>
                                         <h3 className="text-lg font-bold text-gray-900">{review.name}</h3>
-                                        <p className="text-sm text-gray-500">{timeAgo(review.createdAt)}</p>
+                                        <p className="text-sm text-gray-500">{timeAgo(review.createdAt, lang)}</p>
                                     </div>
                                 </div>
 
@@ -101,7 +119,7 @@ export default function Reviews() {
                                 {review.ownerResponse && (
                                     <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                                         <div className="flex items-center mb-2">
-                                            <span className="text-xs font-bold text-royal-blue uppercase tracking-wider">Response from Owner</span>
+                                            <span className="text-xs font-bold text-royal-blue uppercase tracking-wider">{t("Response from Owner", "होटल की ओर से जवाब")}</span>
                                         </div>
                                         <p className="text-sm text-gray-600">{review.ownerResponse}</p>
                                     </div>
@@ -113,7 +131,7 @@ export default function Reviews() {
 
                 {/* CTA to leave a review */}
                 <div className="mt-12 text-center">
-                    <p className="text-gray-600 mb-4">Stayed with us? We'd love to hear your feedback!</p>
+                    <p className="text-gray-600 mb-4">{t("Stayed with us? We'd love to hear your feedback!", "हमारे यहाँ ठहरे थे? अपनी राय ज़रूर बताएँ!")}</p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                     <a
                         href={GOOGLE_REVIEWS_URL}
@@ -122,14 +140,14 @@ export default function Reviews() {
                         className="inline-flex items-center space-x-2 border border-royal-blue text-royal-blue font-bold px-6 py-3 rounded-lg hover:bg-royal-blue/5 transition-colors"
                     >
                         <ExternalLink className="h-4 w-4" />
-                        <span>Read all reviews on Google</span>
+                        <span>{t("Read all reviews on Google", "गूगल पर सभी रिव्यू पढ़ें")}</span>
                     </a>
                     <Link
                         href="/feedback"
                         className="inline-flex items-center space-x-2 bg-royal-blue text-white font-bold px-6 py-3 rounded-lg shadow-md hover:bg-royal-blue/90 transition-colors"
                     >
                         <MessageSquare className="h-4 w-4" />
-                        <span>Leave a Review</span>
+                        <span>{t("Leave a Review", "रिव्यू लिखें")}</span>
                     </Link>
                     </div>
                 </div>

@@ -1,13 +1,21 @@
+"use client";
+
+import { useLang } from "@/lib/i18n";
+
 export default function Location() {
+    const { t } = useLang();
     return (
         <section id="location" className="py-20 bg-gray-50">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="text-center max-w-3xl mx-auto mb-16">
                     <h2 className="text-3xl font-bold font-heading text-gray-900 sm:text-4xl">
-                        Find Us on the Highway
+                        {t("Find Us on the Highway", "हाईवे पर हमें ढूँढें")}
                     </h2>
                     <p className="mt-4 text-lg text-gray-600">
-                        Conveniently located in Ambedkar Nagar on the main Ayodhya Road. Look out for the Fire Station landmark.
+                        {t(
+                            "Conveniently located in Ambedkar Nagar on the main Ayodhya Road. Look out for the Fire Station landmark.",
+                            "अम्बेडकर नगर में मुख्य अयोध्या रोड पर स्थित। पहचान के लिए फ़ायर स्टेशन देखें।"
+                        )}
                     </p>
                 </div>
 
@@ -33,7 +41,7 @@ export default function Location() {
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center rounded-md bg-royal-blue px-8 py-3 text-sm font-semibold text-white shadow-sm hover:bg-royal-blue-light transition-all"
                         >
-                            Get Google Map Directions
+                            {t("Get Google Map Directions", "गूगल मैप पर रास्ता देखें")}
                         </a>
                     </div>
                 </div>
