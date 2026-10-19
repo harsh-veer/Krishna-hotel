@@ -19,11 +19,12 @@ const safeEqual = (a: string, b: string) => {
 };
 
 export function checkAdminPassword(password: unknown) {
-  const expected = process.env.ADMIN_PASSWORD;
+  // Trim both sides: a space or newline pasted into Vercel or the login box is easy to miss.
+  const expected = process.env.ADMIN_PASSWORD?.trim();
   if (!expected || typeof password !== "string") return false;
   // Compare hashes so the comparison takes the same time whatever the input length.
   const h = (v: string) => crypto.createHash("sha256").update(v).digest("hex");
-  return safeEqual(h(password), h(expected));
+  return safeEqual(h(password.trim()), h(expected));
 }
 
 export function createSessionToken() {
