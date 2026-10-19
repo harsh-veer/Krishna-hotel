@@ -58,12 +58,12 @@ const HOTEL_KNOWLEDGE_BASE = {
     {
       name: "Standard Ac Room",
       price: "₹1,200 / night (Most Popular)",
-      features: "1 Double Bed, 2 Guests, Split AC, Flat TV, attached bath with 24/7 hot water, free Wi-Fi."
+      features: "1 Double Bed, 2 Guests, Split AC, Flat TV, attached bath with geyser (24/7 hot water), free Wi-Fi."
     },
     {
       name: "Super-Deluxe Room",
       price: "₹1,500 / night",
-      features: "1 Queen Bed, 2-3 Guests, High-power Split AC, Premium Bath, 32\" Smart LED TV, seating lounge, free Wi-Fi."
+      features: "1 Queen Bed, 2-3 Guests, High-power Split AC, Premium Bath with geyser (24/7 hot water), 32\" Smart LED TV, seating lounge, free Wi-Fi."
     }
   ]
 };
@@ -136,7 +136,7 @@ export async function POST(req: Request) {
         .join("\n\n");
 
       return NextResponse.json({
-        reply: `🛏️ **Room Categories & Rates at Krishna Hotel:**\n\n${roomDetails}\n\n✨ All rooms include free high-speed Wi-Fi, 24/7 hot water, and room service.\n\n📲 **Reserve a room now:** [Book via WhatsApp](${HOTEL_KNOWLEDGE_BASE.whatsapp}) or Call [${HOTEL_KNOWLEDGE_BASE.phone}](tel:+918604680149).`
+        reply: `🛏️ **Room Categories & Rates at Krishna Hotel:**\n\n${roomDetails}\n\n✨ All rooms include free high-speed Wi-Fi and room service. AC rooms have a geyser for 24/7 hot water.\n\n📲 **Reserve a room now:** [Book via WhatsApp](${HOTEL_KNOWLEDGE_BASE.whatsapp}) or Call [${HOTEL_KNOWLEDGE_BASE.phone}](tel:+918604680149).`
       });
     }
 

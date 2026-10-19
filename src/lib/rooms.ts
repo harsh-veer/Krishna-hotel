@@ -5,6 +5,7 @@ import {
   Bed,
   ShowerHead,
   Coffee,
+  Heater,
   type LucideIcon,
 } from "lucide-react";
 
@@ -39,6 +40,7 @@ export const ROOMS_DATA: Record<string, RoomData> = {
       { icon: Tv, name: "32\" Smart LED TV" },
       { icon: Bed, name: "Comfortable Queen Bed" },
       { icon: ShowerHead, name: "Premium Toiletries & Towels" },
+      { icon: Heater, name: "Geyser (24/7 Hot Water)" },
     ],
     faqs: [
       { q: "Is extra bedding available?", a: "Yes, we can provide an extra mattress for a third guest upon request for a small fee." },
@@ -61,6 +63,7 @@ export const ROOMS_DATA: Record<string, RoomData> = {
       { icon: Tv, name: "Flat Screen TV" },
       { icon: Bed, name: "Comfortable Double Bed" },
       { icon: ShowerHead, name: "Attached Bath & Hot Water" },
+      { icon: Heater, name: "Geyser (24/7 Hot Water)" },
     ],
     faqs: [
       { q: "Is parking safe?", a: "Yes, we have 24/7 guarded CCTV-monitored parking space for cars and bikes free of charge." },
