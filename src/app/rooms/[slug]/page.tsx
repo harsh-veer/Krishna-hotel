@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ROOMS_DATA } from "@/lib/rooms";
 import { HOTEL_NAME, SITE_URL } from "@/lib/hotel";
+import { languageAlternates } from "@/lib/i18n/seo";
 import RoomDetail from "./RoomDetail";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
-    alternates: { canonical: url },
+    alternates: { canonical: url, languages: languageAlternates(`/rooms/${slug}`) },
     openGraph: {
       title,
       description,

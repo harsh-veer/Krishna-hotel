@@ -11,7 +11,7 @@ const toSlug = (name: string) =>
     name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 
 export default function Rooms() {
-    const { lang, t } = useLang();
+    const { lang, t, href } = useLang();
     const rooms = [
         {
             id: 1,
@@ -125,7 +125,7 @@ export default function Rooms() {
 
                                 <div className="flex gap-2">
                                     <Link
-                                        href={`/rooms/${toSlug(room.name)}`}
+                                        href={href(`/rooms/${toSlug(room.name)}`)}
                                         className="flex-1 text-center rounded-lg border border-royal-blue px-4 py-3 text-sm font-semibold text-royal-blue hover:bg-royal-blue hover:text-white transition-colors duration-200"
                                     >
                                         {t("View Details", "पूरी जानकारी")}

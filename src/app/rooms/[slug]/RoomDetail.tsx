@@ -28,7 +28,7 @@ import { ROOMS_HI } from "@/lib/i18n/rooms";
 
 export default function RoomDetail({ slug }: { slug: string }) {
   const room = ROOMS_DATA[slug];
-  const { lang, t } = useLang();
+  const { lang, t, href } = useLang();
   // Hindi text for display only; room.name (English) is what goes to the API and WhatsApp.
   const hi = lang === "hi" ? ROOMS_HI[slug] : undefined;
 
@@ -92,7 +92,7 @@ export default function RoomDetail({ slug }: { slug: string }) {
       <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
         <h1 className="text-2xl font-bold text-gray-900">{t("Room Not Found", "कमरा नहीं मिला")}</h1>
         <p className="text-gray-500">{t("The room you are looking for does not exist.", "आप जो कमरा ढूँढ रहे हैं, वह मौजूद नहीं है।")}</p>
-        <Link href="/" className="bg-royal-blue text-white px-5 py-2.5 rounded-lg font-bold">
+        <Link href={href("/")} className="bg-royal-blue text-white px-5 py-2.5 rounded-lg font-bold">
           {t("Back to Home", "होम पेज पर जाएँ")}
         </Link>
       </div>
@@ -173,7 +173,7 @@ export default function RoomDetail({ slug }: { slug: string }) {
         
         {/* Back Link */}
         <div>
-          <Link href="/#rooms" className="inline-flex items-center space-x-2 text-sm font-semibold text-gray-500 hover:text-royal-blue transition-colors">
+          <Link href={href("/#rooms")} className="inline-flex items-center space-x-2 text-sm font-semibold text-gray-500 hover:text-royal-blue transition-colors">
             <ArrowLeft className="h-4 w-4" />
             <span>{t("Back to Room Lists", "सभी कमरे देखें")}</span>
           </Link>

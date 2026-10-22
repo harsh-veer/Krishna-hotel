@@ -1,3 +1,2 @@
-Update 14: event & hall booking only.
-Requires updates 12 and 13 to already be on your site (it changes files from them).
-Extract over krishna-hotel folder, then git add -A / git commit / git push.
+Update 15: booking panel (/events) + Hindi pages (/hi). No SEO landing pages.
+Extract over your krishna-hotel folder (replace files), then git add -A / git commit / git push.

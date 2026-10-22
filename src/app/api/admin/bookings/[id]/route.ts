@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/adminAuth';
 import dbConnect from '@/lib/mongodb';
 import { Contact } from '@/models/Contact';
-import { sendBookingStatusEmail } from '@/lib/mailer';
+import { sendBookingStatusEmail, sendReviewRequestEmail } from '@/lib/mailer';
 
 export async function DELETE(
   req: Request,
@@ -87,6 +87,16 @@ export async function PATCH(
         console.log(`Status email (${status}) sent: ${emailSent} to ${previous.email}`);
       } catch (mailError) {
         console.error('Status email failed:', mailError);
+      }
+    }
+
+    // After check-out, thank the guest and ask for a Google review.
+    if (status === 'Checked-out' && previous.status !== status && previous.email) {
+      try {
+        emailSent = await sendReviewRequestEmail({ name: previous.name, email: previous.email });
+        console.log(`Review request sent: ${emailSent} to ${previous.email}`);
+      } catch (mailError) {
+        console.error('Review request email failed:', mailError);
       }
     }
 

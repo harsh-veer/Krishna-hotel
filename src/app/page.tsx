@@ -9,9 +9,10 @@ import Gallery from "@/components/Gallery";
 import Dining from "@/components/Dining";
 import Contact from "@/components/Contact";
 import FAQ from "@/components/FAQ";
+import { languageAlternates } from "@/lib/i18n/seo";
 
 export const metadata: Metadata = {
-  alternates: { canonical: "/" },
+  alternates: { canonical: "/", languages: languageAlternates("/") },
 };
 
 export default function Home() {

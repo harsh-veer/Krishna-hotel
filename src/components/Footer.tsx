@@ -34,6 +34,7 @@ export default function Footer() {
                             <li><a href={href("/#amenities")} className="hover:text-gold transition">{t("Amenities", "सुविधाएँ")}</a></li>
                             <li><a href={href("/#gallery")} className="hover:text-gold transition">{t("Gallery", "गैलरी")}</a></li>
                             <li><a href={href("/#reviews")} className="hover:text-gold transition">{t("Reviews", "रिव्यू")}</a></li>
+                            <li><a href="/events" className="hover:text-gold transition">{t("Book banquet hall & events", "बैंक्वेट हॉल और इवेंट बुक करें")}</a></li>
                         </ul>
                     </div>
                     <div>
@@ -45,15 +46,6 @@ export default function Footer() {
                         </ul>
                     </div>
                 </div>
-                <nav aria-label={t("Popular searches", "लोकप्रिय खोजें")} className="mt-8 border-t border-gray-800 pt-6 text-sm text-gray-400">
-                    <span className="mr-2 font-semibold text-gray-300">{t("Popular searches:", "लोकप्रिय खोजें:")}</span>
-                    <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 sm:mt-0 sm:inline-flex">
-                        <li><a href="/hotel-near-ayodhya" className="hover:text-gold transition">{t("Hotel near Ayodhya Ram Mandir", "अयोध्या राम मंदिर के पास होटल")}</a></li>
-                        <li><a href="/hotel-in-akbarpur" className="hover:text-gold transition">{t("Hotel in Akbarpur", "अकबरपुर में होटल")}</a></li>
-                        <li><a href="/banquet-hall-ambedkar-nagar" className="hover:text-gold transition">{t("Banquet hall in Ambedkar Nagar", "अम्बेडकर नगर में बैंक्वेट हॉल")}</a></li>
-                        <li><a href="/events" className="hover:text-gold transition">{t("Book banquet hall & events", "बैंक्वेट हॉल और इवेंट बुक करें")}</a></li>
-                    </ul>
-                </nav>
                 <div className="mt-6 border-t border-gray-700 pt-8 text-center text-sm text-gray-400">
                     <p>&copy; {new Date().getFullYear()} {t("Krishna Hotel. All rights reserved.", "कृष्णा होटल। सर्वाधिकार सुरक्षित।")}</p>
                 </div>

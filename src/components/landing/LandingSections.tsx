@@ -1,5 +1,5 @@
 // Server-rendered building blocks for the local-SEO landing pages
-// (/hotel-near-ayodhya, /hotel-in-akbarpur, /banquet-hall-ambedkar-nagar).
+// (/events).
 // Visual language follows the home page (Hero.tsx, Rooms.tsx, Features.tsx): full-bleed photo hero,
 // gold badge, royal-blue / gold accents, big photos, short copy.
 // English-only on purpose: these pages are not wired into the client-side Hindi switch.
@@ -402,9 +402,6 @@ export function CtaBand({ title, text, whatsappHref, whatsappLabel, bookLabel, b
     current: string;
 }) {
     const links = [
-        { href: "/hotel-near-ayodhya", label: "Hotel near Ayodhya" },
-        { href: "/hotel-in-akbarpur", label: "Hotel in Akbarpur" },
-        { href: "/banquet-hall-ambedkar-nagar", label: "Banquet hall" },
         { href: "/events", label: "Book an event" },
     ].filter((l) => l.href !== current);
     return (

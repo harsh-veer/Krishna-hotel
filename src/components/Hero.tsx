@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 
 export default function Hero() {
-    const { t } = useLang();
+    const { t, lang } = useLang();
     return (
         <section className="relative h-[90vh] min-h-[600px] w-full bg-gray-900">
             {/* Background Image */}
@@ -30,9 +30,12 @@ export default function Hero() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
                     >
-                        <span className="mb-4 inline-block rounded-full bg-gold/90 px-3 py-1 text-sm font-semibold tracking-wider text-gray-900 uppercase backdrop-blur-md mr-2">
-                            {t("Welcome to Krishna Hotel", "कृष्णा होटल में आपका स्वागत है")}
-                        </span>
+                        {/* In Hindi the Ram Nagari greeting below already welcomes the guest, so skip this one. */}
+                        {lang !== "hi" && (
+                            <span className="mb-4 inline-block rounded-full bg-gold/90 px-3 py-1 text-sm font-semibold tracking-wider text-gray-900 uppercase backdrop-blur-md mr-2">
+                                Welcome to Krishna Hotel
+                            </span>
+                        )}
                         <span className="mb-4 inline-block rounded-full bg-gold/90 px-3 py-1 text-sm font-semibold tracking-wider text-gray-900 uppercase backdrop-blur-md">
                             प्रभु श्री राम की नगरी में आपका हार्दिक स्वागत एवं अभिनंदन!
                         </span>
@@ -44,7 +47,7 @@ export default function Hero() {
                         transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
                         className="mb-6 font-heading text-5xl font-bold tracking-tight text-white sm:text-6xl md:text-7xl"
                     >
-                        {t("Comfortable & Affordable Stay in ", "आरामदायक और किफ़ायती ठहराव, ")}<span className="text-gold border-b-4 border-gold leading-tight">{t("Ambedkar Nagar", "अम्बेडकर नगर में")}</span>
+                        {t("Comfortable & Affordable Stay in ", "आरामदायक और किफ़ायती ठहराव ")}<span className="text-gold border-b-4 border-gold leading-tight">{t("Ambedkar Nagar", "अम्बेडकर नगर में")}</span>
                     </motion.h1>
                     
                     <motion.p 
@@ -55,7 +58,7 @@ export default function Hero() {
                     >
                         {t(
                             "Experience premium hospitality on the Ayodhya highway. Perfect for families, pilgrims, and business travelers looking for clean and budget-friendly AC rooms.",
-                            "अयोध्या हाईवे पर बेहतरीन मेहमाननवाज़ी का अनुभव करें। साफ़-सुथरे और किफ़ायती एसी कमरे चाहने वाले परिवारों, श्रद्धालुओं और बिज़नेस यात्रियों के लिए एकदम सही।"
+                            "अयोध्या हाईवे पर साफ़-सुथरे, किफ़ायती एसी कमरे। परिवारों, श्रद्धालुओं और यात्रियों के लिए।"
                         )}
                     </motion.p>
 

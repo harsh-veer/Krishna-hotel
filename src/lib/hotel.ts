@@ -8,6 +8,9 @@ export const GOOGLE_RATING = 3.8;
 export const GOOGLE_REVIEW_COUNT = 180;
 export const GOOGLE_REVIEWS_URL =
   "https://www.google.com/maps/search/Krishna+Hotel+Akbarpur+Ambedkar+Nagar/";
+// Link sent to guests after check-out. Replace with the "Ask for reviews" link from
+// Google Business Profile (looks like https://g.page/r/XXXX/review) so it opens the review box directly.
+export const GOOGLE_WRITE_REVIEW_URL = GOOGLE_REVIEWS_URL;
 
 // House rules shown next to the booking buttons. Edit these to match how the front desk works.
 // Set EXTRA_BED_PRICE to a number (e.g. 300) to show the price; null shows "ask at reception".

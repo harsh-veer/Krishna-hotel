@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Poppins } from "next/font/google";
+import { Hind, Inter, Poppins } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import OfferBanner from "@/components/OfferBanner";
 import Footer from "@/components/Footer";
@@ -20,7 +20,14 @@ const inter = Inter({
 const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
   variable: "--font-poppins",
-  subsets: ["latin"],
+  subsets: ["latin", "devanagari"],
+});
+
+// Devanagari body font for the Hindi pages (Inter has no Hindi letters, so the browser fell back to a system font).
+const hind = Hind({
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-hind",
+  subsets: ["latin", "devanagari"],
 });
 
 export const metadata: Metadata = {
@@ -37,8 +44,8 @@ export const metadata: Metadata = {
     locale: "en_IN",
     title: "Krishna Hotel | Comfortable & Affordable Stay in Ambedkar Nagar",
     description:
-      "AC rooms from ₹999, free breakfast and safe parking on the Ayodhya-Akbarpur Road in Ambedkar Nagar.",
-    images: [{ url: "/images/gallery-daytime-front.jpg", alt: "Krishna Hotel front view" }],
+      "Rooms from ₹999 (AC from ₹1,200), free breakfast and safe parking on the Ayodhya-Akbarpur Road in Ambedkar Nagar.",
+    images: [{ url: "/images/gallery-suite-seating.jpg", alt: "Krishna Hotel front view" }],
   },
 
   robots: {
@@ -89,7 +96,7 @@ export default function RootLayout({
     },
     telephone: PHONE,
     email: "krishnahotel10851@gmail.com",
-    image: `${SITE_URL}/images/gallery-daytime-front.jpg`,
+    image: `${SITE_URL}/images/gallery-suite-seating.jpg`,
     priceRange: "₹999 - ₹1500",
     checkinTime: "12:00",
     checkoutTime: "11:00",
@@ -107,7 +114,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${inter.variable} ${poppins.variable} font-sans antialiased bg-white text-gray-900 flex flex-col min-h-screen`}
+        className={`${inter.variable} ${poppins.variable} ${hind.variable} font-sans antialiased bg-white text-gray-900 flex flex-col min-h-screen`}
       >
         <LanguageProvider>
           <OfferBanner />
