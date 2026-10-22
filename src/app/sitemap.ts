@@ -16,6 +16,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.8,
     })),
+    ...["hotel-near-ayodhya", "hotel-in-akbarpur", "banquet-hall-ambedkar-nagar", "events"].map((path) => ({
+      url: `${SITE_URL}/${path}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.9,
+    })),
+    // Hindi versions
+    {
+      url: `${SITE_URL}/hi`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    ...Object.keys(ROOMS_DATA).map((slug) => ({
+      url: `${SITE_URL}/hi/rooms/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
     {
       url: `${SITE_URL}/feedback`,
       lastModified: new Date(),

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useLang } from "@/lib/i18n";
 
 export default function Footer() {
-    const { t } = useLang();
+    const { t, href } = useLang();
     return (
         <footer className="bg-gray-900 text-white">
             <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -30,10 +30,10 @@ export default function Footer() {
                     <div>
                         <h3 className="text-lg font-bold font-heading mb-4">{t("Quick Links", "ज़रूरी लिंक")}</h3>
                         <ul className="space-y-2 text-gray-300">
-                            <li><a href="/#rooms" className="hover:text-gold transition">{t("Rooms", "कमरे")}</a></li>
-                            <li><a href="/#amenities" className="hover:text-gold transition">{t("Amenities", "सुविधाएँ")}</a></li>
-                            <li><a href="/#gallery" className="hover:text-gold transition">{t("Gallery", "गैलरी")}</a></li>
-                            <li><a href="/#reviews" className="hover:text-gold transition">{t("Reviews", "रिव्यू")}</a></li>
+                            <li><a href={href("/#rooms")} className="hover:text-gold transition">{t("Rooms", "कमरे")}</a></li>
+                            <li><a href={href("/#amenities")} className="hover:text-gold transition">{t("Amenities", "सुविधाएँ")}</a></li>
+                            <li><a href={href("/#gallery")} className="hover:text-gold transition">{t("Gallery", "गैलरी")}</a></li>
+                            <li><a href={href("/#reviews")} className="hover:text-gold transition">{t("Reviews", "रिव्यू")}</a></li>
                         </ul>
                     </div>
                     <div>
@@ -45,7 +45,16 @@ export default function Footer() {
                         </ul>
                     </div>
                 </div>
-                <div className="mt-8 border-t border-gray-700 pt-8 text-center text-sm text-gray-400">
+                <nav aria-label={t("Popular searches", "लोकप्रिय खोजें")} className="mt-8 border-t border-gray-800 pt-6 text-sm text-gray-400">
+                    <span className="mr-2 font-semibold text-gray-300">{t("Popular searches:", "लोकप्रिय खोजें:")}</span>
+                    <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 sm:mt-0 sm:inline-flex">
+                        <li><a href="/hotel-near-ayodhya" className="hover:text-gold transition">{t("Hotel near Ayodhya Ram Mandir", "अयोध्या राम मंदिर के पास होटल")}</a></li>
+                        <li><a href="/hotel-in-akbarpur" className="hover:text-gold transition">{t("Hotel in Akbarpur", "अकबरपुर में होटल")}</a></li>
+                        <li><a href="/banquet-hall-ambedkar-nagar" className="hover:text-gold transition">{t("Banquet hall in Ambedkar Nagar", "अम्बेडकर नगर में बैंक्वेट हॉल")}</a></li>
+                        <li><a href="/events" className="hover:text-gold transition">{t("Book banquet hall & events", "बैंक्वेट हॉल और इवेंट बुक करें")}</a></li>
+                    </ul>
+                </nav>
+                <div className="mt-6 border-t border-gray-700 pt-8 text-center text-sm text-gray-400">
                     <p>&copy; {new Date().getFullYear()} {t("Krishna Hotel. All rights reserved.", "कृष्णा होटल। सर्वाधिकार सुरक्षित।")}</p>
                 </div>
             </div>

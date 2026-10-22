@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import AdminEvents from "@/components/AdminEvents";
+import { GOOGLE_WRITE_REVIEW_URL } from "@/lib/hotel";
 import { 
   Lock, 
   Unlock, 
@@ -69,10 +71,12 @@ export default function AdminDashboard() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   // View States
-  const [activeTab, setActiveTab] = useState<"bookings" | "reviews" | "settings">("bookings");
+  const [activeTab, setActiveTab] = useState<"bookings" | "reviews" | "events" | "settings">("bookings");
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+
+  const [pendingEvents, setPendingEvents] = useState(0);
 
   // Review States
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -191,6 +195,7 @@ export default function AdminDashboard() {
       setError(null);
       fetchReviews();
       fetchSettings();
+      adminFetch("/api/admin/events").then((r) => r.ok ? r.json() : null).then((d) => d && setPendingEvents((d.events || []).filter((e: any) => e.status === "Pending").length)).catch(() => {});
     } catch (err: any) {
       setError(err.message || "Failed to load bookings");
     } finally {
@@ -273,7 +278,9 @@ export default function AdminDashboard() {
 
       const data = await response.json();
       setBookings((prev) => prev.map((b) => b._id === id ? { ...b, status: newStatus } : b));
-      if (data.emailSent) {
+      if (data.emailSent && newStatus === 'Checked-out') {
+        toast.success('Checked out. The guest has been emailed a Google review request.');
+      } else if (data.emailSent) {
         toast.success(`Marked ${newStatus}. The guest has been emailed.`);
       } else if (newStatus === 'Confirmed' || newStatus === 'Cancelled') {
         toast(`Marked ${newStatus}. No email was sent, so please call the guest.`);
@@ -370,6 +377,17 @@ export default function AdminDashboard() {
   const sendWhatsApp = (booking: Booking) => {
     const rawPhone = booking.phone.replace(/\D/g, '');
     const phone = rawPhone.startsWith('91') ? rawPhone : `91${rawPhone}`;
+
+    // After check-out the WhatsApp button asks for a Google review instead of confirming the booking.
+    if (booking.status === 'Checked-out') {
+      const review =
+        `Namaste ${booking.name} 🙏\n\n` +
+        `Thank you for staying at *Krishna Hotel*! We hope you had a comfortable stay.\n\n` +
+        `Could you please rate us on Google? It takes 30 seconds and really helps us:\n${GOOGLE_WRITE_REVIEW_URL}\n\n` +
+        `— Krishna Hotel Team`;
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(review)}`, '_blank');
+      return;
+    }
 
     const message =
       ` Dear ${booking.name},\n\n` +
@@ -556,6 +574,22 @@ export default function AdminDashboard() {
                 {pendingReviewsCount > 0 && (
                   <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
                     {pendingReviewsCount}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab("events")}
+                className={`px-4 py-2 rounded-md text-sm font-semibold transition-all relative ${
+                  activeTab === "events" ? "bg-white text-royal-blue shadow-sm" : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                <span className="flex items-center space-x-1.5">
+                  <CalendarIcon className="h-4 w-4" />
+                  <span>Events</span>
+                </span>
+                {pendingEvents > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                    {pendingEvents}
                   </span>
                 )}
               </button>
@@ -829,7 +863,7 @@ export default function AdminDashboard() {
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => sendWhatsApp(booking)}
-                              title="Send WhatsApp confirmation"
+                              title={booking.status === 'Checked-out' ? "Ask for a Google review on WhatsApp" : "Send WhatsApp confirmation"}
                               className="inline-flex items-center justify-center h-9 w-9 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700 transition-colors"
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4.5 w-4.5">
@@ -1066,6 +1100,9 @@ export default function AdminDashboard() {
             )}
           </div>
         )}
+
+        {/* ===== EVENTS TAB ===== */}
+        {activeTab === "events" && <AdminEvents adminFetch={adminFetch} onPendingCount={setPendingEvents} />}
 
         {/* ===== REVIEWS TAB ===== */}
         {activeTab === "reviews" && (
@@ -1331,7 +1368,7 @@ export default function AdminDashboard() {
                     }}
                     className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold text-xs flex items-center space-x-1 shadow-sm transition-all"
                   >
-                    <span>WhatsApp Conf.</span>
+                    <span>{selectedBooking.status === 'Checked-out' ? 'Ask for Review' : 'WhatsApp Conf.'}</span>
                   </button>
                   <button
                     onClick={() => setSelectedBooking(null)}
