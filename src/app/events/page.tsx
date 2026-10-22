@@ -28,7 +28,7 @@ export const metadata: Metadata = {
         url: URL,
         title: TITLE,
         description: DESCRIPTION,
-        images: [{ url: "/images/gallery-banquet-hall-full.jpg", alt: "Krishna Hotel banquet hall" }],
+        images: [{ url: "/images/RUIDd266a089fa97483aa346a2e6a3a46fcb.jpg", alt: "Krishna Hotel banquet hall" }],
     },
 };
 
@@ -86,7 +86,7 @@ export default function EventsPage() {
                 badge="Halls & Events"
                 title={<>Book Your <Highlight>Event</Highlight> at Krishna Hotel</>}
                 subline="Banquet hall, meeting hall, birthday and kitty parties, ring ceremonies and engagements. Send a request and we will call you to confirm."
-                image="/images/gallery-banquet-hall-full.jpg"
+                image="/images/RUIDd266a089fa97483aa346a2e6a3a46fcb.jpg"
                 imageAlt="Krishna Hotel banquet hall"
                 whatsappHref={whatsapp}
                 bookLabel="Book Event"
