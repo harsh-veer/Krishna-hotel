@@ -1,2 +1,2 @@
-Update 15: booking panel (/events) + Hindi pages (/hi). No SEO landing pages.
-Extract over your krishna-hotel folder (replace files), then git add -A / git commit / git push.
+Update 16: Order on Zomato button (Dining section + footer) and new dining photo.
+Extract over krishna-hotel folder, then git add -A / git commit / git push.

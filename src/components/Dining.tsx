@@ -3,6 +3,7 @@
 import { useLang } from "@/lib/i18n";
 import { Coffee, Utensils, Clock, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
+import { ZOMATO_URL } from "@/lib/hotel";
 
 export default function Dining() {
     const { t } = useLang();
@@ -73,6 +74,19 @@ export default function Dining() {
                                 ))}
                             </ul>
                         </div>
+
+                        <div className="mt-8 rounded-2xl border border-red-100 bg-red-50 p-6">
+                            <p className="font-heading text-lg font-bold text-gray-900">{t("Hungry? Order online", "भूख लगी है? ऑनलाइन ऑर्डर करें")}</p>
+                            <p className="mt-1 text-sm text-gray-600">{t("Krishna Restaurant is on Zomato. Order for delivery or pickup.", "कृष्णा रेस्टोरेंट ज़ोमैटो पर है। डिलीवरी या पिकअप के लिए ऑर्डर करें।")}</p>
+                            <a
+                                href={ZOMATO_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-4 inline-flex items-center justify-center rounded-lg bg-[#E23744] px-6 py-3 text-base font-bold text-white shadow-sm transition-colors hover:bg-[#c92a37]"
+                            >
+                                {t("Order on Zomato", "ज़ोमैटो पर ऑर्डर करें")}
+                            </a>
+                        </div>
                     </div>
 
                     {/* Image Section */}
@@ -82,7 +96,7 @@ export default function Dining() {
                             <Image
                                 fill
                                 sizes="(min-width: 1024px) 50vw, 100vw"
-                                src="/images/indian-food-dining.jpg"
+                                src="/images/dining-kadhai-paneer.jpg"
                                 alt={t("Fresh North Indian Thali & Breakfast Spread", "ताज़ी उत्तर भारतीय थाली और नाश्ता")}
                                 className="w-full h-full object-cover"
                             />

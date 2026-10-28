@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useLang } from "@/lib/i18n";
+import { ZOMATO_URL } from "@/lib/hotel";
 
 export default function Footer() {
     const { t, href } = useLang();
@@ -35,6 +36,7 @@ export default function Footer() {
                             <li><a href={href("/#gallery")} className="hover:text-gold transition">{t("Gallery", "गैलरी")}</a></li>
                             <li><a href={href("/#reviews")} className="hover:text-gold transition">{t("Reviews", "रिव्यू")}</a></li>
                             <li><a href="/events" className="hover:text-gold transition">{t("Book banquet hall & events", "बैंक्वेट हॉल और इवेंट बुक करें")}</a></li>
+                            <li><a href={ZOMATO_URL} target="_blank" rel="noopener noreferrer" className="hover:text-gold transition">{t("Order food on Zomato", "ज़ोमैटो पर खाना मँगवाएँ")}</a></li>
                         </ul>
                     </div>
                     <div>

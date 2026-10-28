@@ -4,6 +4,8 @@ export const SITE_URL = "https://krishnaahotel.in";
 export const HOTEL_NAME = "Krishna Hotel";
 export const PHONE = "+918604680149";
 export const WHATSAPP_NUMBER = "918604680149";
+// Krishna Restaurant on Zomato (guests are sent here to order food for delivery).
+export const ZOMATO_URL = "https://zomato.onelink.me/xqzv/lurmikpq";
 export const GOOGLE_RATING = 3.8;
 export const GOOGLE_REVIEW_COUNT = 180;
 export const GOOGLE_REVIEWS_URL =
