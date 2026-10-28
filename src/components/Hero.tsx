@@ -1,5 +1,6 @@
 "use client";
 
+import { ZOMATO_URL } from "@/lib/hotel";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
@@ -23,7 +24,7 @@ export default function Hero() {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="max-w-3xl"
+                    className="max-w-4xl"
                 >
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -66,23 +67,31 @@ export default function Hero() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
-                        className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4"
+                        className="flex flex-col gap-3 sm:flex-row sm:flex-wrap"
                     >
                         <a
                             href="tel:+918604680149"
-                            className="inline-flex items-center justify-center rounded-md bg-royal-blue px-8 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-royal-blue-light transition-all duration-200"
+                            className="inline-flex items-center justify-center rounded-md bg-royal-blue px-6 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-royal-blue-light transition-all duration-200"
                         >
                             {t("Call Now to Book", "बुकिंग के लिए कॉल करें")}
                         </a>
                         <a
                             href="https://wa.me/918604680149"
-                            className="inline-flex items-center justify-center rounded-md bg-[#25D366] px-8 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-[#20BE5A] transition-all duration-200"
+                            className="inline-flex items-center justify-center rounded-md bg-[#25D366] px-6 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-[#20BE5A] transition-all duration-200"
                         >
                             {t("WhatsApp Booking", "व्हाट्सऐप से बुकिंग")}
                         </a>
+                        <a
+                            href={ZOMATO_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center rounded-md bg-[#E23744] px-6 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-[#c92a37] transition-all duration-200"
+                        >
+                            {t("Order on Zomato", "ज़ोमैटो पर ऑर्डर करें")}
+                        </a>
                         <Link
                             href="#location"
-                            className="inline-flex items-center justify-center rounded-md bg-white/10 px-8 py-3.5 text-base font-semibold text-white backdrop-blur-md hover:bg-white/20 transition-all duration-200 border border-white/20"
+                            className="inline-flex items-center justify-center rounded-md bg-white/10 px-6 py-3.5 text-base font-semibold text-white backdrop-blur-md hover:bg-white/20 transition-all duration-200 border border-white/20"
                         >
                             {t("Get Directions", "रास्ता देखें")} <ArrowRight className="ml-2 h-4 w-4" />
                         </Link>
